@@ -4,6 +4,7 @@
 
 namespace Engine {
 	std::shared_ptr<spdlog::logger> loggerSys::s_consoleLogger = nullptr;
+	std::shared_ptr<spdlog::logger> loggerSys::s_fileLogger = nullptr;
 
 	void Engine::loggerSys::start(SystemSignal init, ...)
 	{
@@ -12,5 +13,19 @@ namespace Engine {
 
 		s_consoleLogger = spdlog::stdout_color_mt("Console");
 
+		char filepath[256] = "logs/";
+		char time[128];
+
+		try {
+			std::time_t t = std::time(nullptr);
+			std::strftime(time, sizeof(time), "%d_%m_%y %I_%M_%S", std::localtime(&t));
+			strcat_s(filepath, time);
+			strcat_s(filepath, ".txt");
+			s_fileLogger = spdlog::basic_logger_mt("file", filepath);
+		}
+		catch (const spdlog::spdlog_ex& e) {
+			s_consoleLogger->error("Could not start file logger: {0}", e.what());
+			s_fileLogger.reset();
+		}
 	}
 }

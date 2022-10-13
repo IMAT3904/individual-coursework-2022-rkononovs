@@ -31,6 +31,7 @@ namespace Engine {
 		loggerSys::info("Application is starting.");
 		while (m_running)
 		{
+			loggerSys::file("Testing.");
 		};
 	}
 

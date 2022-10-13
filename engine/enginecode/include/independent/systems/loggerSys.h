@@ -9,6 +9,7 @@ namespace Engine {
 	class loggerSys : public System {
 	private:
 		static std::shared_ptr<spdlog::logger> s_consoleLogger;
+		static std::shared_ptr<spdlog::logger> s_fileLogger;
 	public:
 		void start(SystemSignal init = SystemSignal::None, ...); //!< Start the logger
 		void stop(SystemSignal close = SystemSignal::None, ...) {}; //!< Stop the logger
@@ -24,6 +25,8 @@ namespace Engine {
 		static void trace(Args&&... args); //!< Trace level logging
 		template<class ...Args>
 		static void debug(Args&&... args); //!< Debugging level logging
+		template<class ...Args>
+		static void file(Args&&... args); //!< Debugging level logging
 	};
 
 	template<class ...Args>
@@ -49,5 +52,10 @@ namespace Engine {
 	template<class ...Args>
 	static void loggerSys::debug(Args&&... args) {
 		s_consoleLogger->debug(std::forward<Args>(args) ...);
+	}
+
+	template<class ...Args>
+	static void loggerSys::file(Args&&... args) {
+		if(s_fileLogger) s_fileLogger->trace(std::forward<Args>(args) ...);
 	}
 }
