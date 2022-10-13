@@ -2,6 +2,7 @@
 */
 #pragma once
 
+#include "systems/loggerSys.h"
 
 namespace Engine {
 
@@ -15,6 +16,8 @@ namespace Engine {
 	{
 	protected:
 		Application(); //!< Constructor
+
+		std::shared_ptr<loggerSys> m_loggerSystem;
 	private:
 		static Application* s_instance; //!< Singleton instance of the application
 		bool m_running = true; //!< Is the application running?
