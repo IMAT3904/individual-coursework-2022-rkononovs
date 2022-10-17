@@ -29,9 +29,12 @@ namespace Engine {
 	void Application::run()
 	{
 		loggerSys::info("Application is starting.");
+		//loggerSys::file("Testing.");
+		loggerSys::file("Application is starting."); // TODO: FIX BUG WHEN SOMETIMES IT'S NOT LOGGING PROPERLY :(
+		//loggerSys::file("Testing.");
 		while (m_running)
 		{
-			loggerSys::file("Testing.");
+			//loggerSys::file("Testing.");
 		};
 	}
 

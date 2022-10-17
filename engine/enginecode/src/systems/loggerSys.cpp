@@ -1,6 +1,7 @@
 /** \file loggerSys.cpp */
 #include "engine_pch.h"
 #include "systems/loggerSys.h"
+#include <direct.h>
 
 namespace Engine {
 	std::shared_ptr<spdlog::logger> loggerSys::s_consoleLogger = nullptr;
@@ -15,6 +16,8 @@ namespace Engine {
 
 		char filepath[256] = "logs/";
 		char time[128];
+
+		mkdir(filepath);
 
 		try {
 			std::time_t t = std::time(nullptr);
