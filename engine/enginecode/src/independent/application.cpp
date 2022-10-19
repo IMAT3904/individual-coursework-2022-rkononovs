@@ -14,9 +14,13 @@ namespace Engine {
 		{
 			s_instance = this;
 		}
-		//Start logger
+		// Start logger
 		m_loggerSystem.reset(new loggerSys);
 		m_loggerSystem->start();
+		
+		// Reset and start timer
+		m_timer.reset(new miliTimer);
+		m_timer->start();
 	}
 
 	Application::~Application()
@@ -28,13 +32,23 @@ namespace Engine {
 
 	void Application::run()
 	{
+		float timestep = 0.f;
+		float timeSeconds = 0.f;
+		int seconds = 0;
 		loggerSys::info("Application is starting.");
-		//loggerSys::file("Testing.");
 		loggerSys::file("Application is starting."); // TODO: FIX BUG WHEN SOMETIMES IT'S NOT LOGGING PROPERLY :(
-		//loggerSys::file("Testing.");
 		while (m_running)
 		{
-			//loggerSys::file("Testing.");
+			timestep = m_timer->getElapsedTime();
+			timeSeconds += timestep;
+			if (timeSeconds >= 1) {
+				seconds++;
+				loggerSys::trace("{0} seconds elapsed", seconds); // TODO: FIX TIMER THAT INCREMENTS NOT IN SECONDS BUT IN 3 SECONDS :(
+				timeSeconds = 0;
+			}
+			// loggerSys::trace("FPS {0}", 1.0f / timestep);
+
+			m_timer->reset();
 		};
 	}
 

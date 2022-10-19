@@ -3,6 +3,7 @@
 #pragma once
 
 #include "systems/loggerSys.h"
+#include "core/timer.h"
 
 namespace Engine {
 
@@ -14,13 +15,14 @@ namespace Engine {
 
 	class Application
 	{
-	protected:
-		Application(); //!< Constructor
-
-		std::shared_ptr<loggerSys> m_loggerSystem;
 	private:
 		static Application* s_instance; //!< Singleton instance of the application
 		bool m_running = true; //!< Is the application running?
+	protected:
+		Application(); //!< Constructor
+
+		std::shared_ptr<loggerSys> m_loggerSystem; //!< Logger for system logging
+		std::shared_ptr<timer> m_timer; //!< Timer for keeping the time in the engine
 	public:
 		virtual ~Application(); //!< Deconstructor
 		inline static Application& getInstance() { return *s_instance; } //!< Instance getter from singleton pattern
