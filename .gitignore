@@ -2,7 +2,7 @@
 .vs/
 bin/
 build/
-logs/
+sandbox/logs/
 
 # Files
 *.user

@@ -17,9 +17,8 @@ namespace Engine {
 		char filepath[256] = "logs/";
 		char time[128];
 
-		mkdir(filepath);
-
 		try {
+			mkdir(filepath);
 			std::time_t t = std::time(nullptr);
 			std::strftime(time, sizeof(time), "%d_%m_%y %I_%M_%S", std::localtime(&t));
 			strcat_s(filepath, time);
@@ -29,6 +28,9 @@ namespace Engine {
 		catch (const spdlog::spdlog_ex& e) {
 			s_consoleLogger->error("Could not start file logger: {0}", e.what());
 			s_fileLogger.reset();
+		}
+		catch (std::exception& e) {
+			s_consoleLogger->error("Uncalled error");
 		}
 	}
 }

@@ -12,7 +12,8 @@ namespace Engine {
 	public:
 		virtual void start() = 0; //!< Starting the timer
 		virtual void reset() = 0; //!< Reset the timer
-		virtual float getElapsedTime() = 0; //!< Get the time elapsed since start of the timer
+		virtual float getElapsedMiliTime() = 0; //!< Get the time elapsed since start of the timer in 
+		virtual float getElapsedSeconds() = 0;
 	};
 
 	/**
@@ -27,11 +28,19 @@ namespace Engine {
 	public:
 		inline void start() override { m_startTime = std::chrono::high_resolution_clock::now(); }
 		inline void reset() override { m_startTime = std::chrono::high_resolution_clock::now(); }
-		float getElapsedTime() {
+
+		float getElapsedMiliTime() {
 			m_endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float, std::milli> elapsed = m_endTime - m_startTime;
 
 			return elapsed.count() / 1000.f;
+		}
+		
+		float getElapsedSeconds() {
+			m_endTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<float> elapsed = m_endTime - m_startTime;
+
+			return elapsed.count();
 		}
 	};
 }

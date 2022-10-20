@@ -56,6 +56,6 @@ namespace Engine {
 
 	template<class ...Args>
 	static void loggerSys::file(Args&&... args) {
-		if(s_fileLogger) s_fileLogger->trace(std::forward<Args>(args) ...);
+		if (s_fileLogger) s_fileLogger->info(std::forward<Args>(args) ...); s_fileLogger->flush();
 	}
 }

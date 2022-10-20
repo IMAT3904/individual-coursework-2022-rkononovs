@@ -36,10 +36,11 @@ namespace Engine {
 		float timeSeconds = 0.f;
 		int seconds = 0;
 		loggerSys::info("Application is starting.");
-		loggerSys::file("Application is starting."); // TODO: FIX BUG WHEN SOMETIMES IT'S NOT LOGGING PROPERLY :(
+		loggerSys::file("Application is starting. One");
+		loggerSys::file("Application is starting. Two");
 		while (m_running)
 		{
-			timestep = m_timer->getElapsedTime();
+			m_timer->reset();
 			timeSeconds += timestep;
 			if (timeSeconds >= 1) {
 				seconds++;
@@ -48,7 +49,7 @@ namespace Engine {
 			}
 			// loggerSys::trace("FPS {0}", 1.0f / timestep);
 
-			m_timer->reset();
+			timestep = m_timer->getElapsedMiliTime();
 		};
 	}
 
