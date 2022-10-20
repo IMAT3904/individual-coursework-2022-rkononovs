@@ -2,6 +2,7 @@
 .vs/
 bin/
 build/
+logs/
 
 # Files
 *.user
