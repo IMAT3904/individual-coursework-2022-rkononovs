@@ -55,6 +55,13 @@ namespace Engine {
 				timeSeconds = 0;
 				m_timerSeconds->reset();
 			}
+
+			if (seconds > 5) {
+				WindowResizeEvent resize(800, 600);
+			}
+			if (seconds > 8) {
+				WindowCloseEvent close();
+			}
 		};
 	}
 
