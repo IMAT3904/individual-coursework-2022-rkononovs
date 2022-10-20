@@ -21,6 +21,9 @@ namespace Engine {
 		// Reset and start timer
 		m_timer.reset(new miliTimer);
 		m_timer->start();
+
+		m_timerSeconds.reset(new secondsTimer);
+		m_timerSeconds->start();
 	}
 
 	Application::~Application()
@@ -40,16 +43,18 @@ namespace Engine {
 		loggerSys::file("Application is starting. Two");
 		while (m_running)
 		{
+			timestep = m_timer->getElapsedTime();
 			m_timer->reset();
-			timeSeconds += timestep;
-			if (timeSeconds >= 1) {
+			timeSeconds = m_timerSeconds->getElapsedTime();
+
+
+			if (timeSeconds >= 1) { // Check if second passed, if yes output how many seconds passed in total.
 				seconds++;
-				loggerSys::trace("{0} seconds elapsed", seconds); // TODO: FIX TIMER THAT INCREMENTS NOT IN SECONDS BUT IN 3 SECONDS :(
+				loggerSys::trace("{0} seconds elapsed", seconds);
 				timeSeconds = 0;
+				m_timerSeconds->reset();
 			}
 			// loggerSys::trace("FPS {0}", 1.0f / timestep);
-
-			timestep = m_timer->getElapsedMiliTime();
 		};
 	}
 

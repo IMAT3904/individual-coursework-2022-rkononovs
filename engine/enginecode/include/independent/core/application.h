@@ -23,6 +23,7 @@ namespace Engine {
 
 		std::shared_ptr<loggerSys> m_loggerSystem; //!< Logger for system logging
 		std::shared_ptr<timer> m_timer; //!< Timer for keeping the time in the engine
+		std::shared_ptr<timer> m_timerSeconds;
 	public:
 		virtual ~Application(); //!< Deconstructor
 		inline static Application& getInstance() { return *s_instance; } //!< Instance getter from singleton pattern
