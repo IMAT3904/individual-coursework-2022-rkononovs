@@ -4,6 +4,7 @@
 
 #include "systems/loggerSys.h"
 #include "core/timer.h"
+#include "events/events.h"
 
 namespace Engine {
 
@@ -21,9 +22,9 @@ namespace Engine {
 	protected:
 		Application(); //!< Constructor
 
-		std::shared_ptr<loggerSys> m_loggerSystem; //!< Logger for system logging
-		std::shared_ptr<timer> m_timer; //!< Timer for keeping the time in the engine
-		std::shared_ptr<timer> m_timerSeconds;
+		std::shared_ptr<LoggerSys> m_loggerSystem; //!< Logger for system logging
+		std::shared_ptr<Timer> m_timer; //!< Timer for keeping the time in the engine
+		std::shared_ptr<Timer> m_timerSeconds;
 	public:
 		virtual ~Application(); //!< Deconstructor
 		inline static Application& getInstance() { return *s_instance; } //!< Instance getter from singleton pattern

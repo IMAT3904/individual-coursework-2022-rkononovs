@@ -15,14 +15,14 @@ namespace Engine {
 			s_instance = this;
 		}
 		// Start logger
-		m_loggerSystem.reset(new loggerSys);
+		m_loggerSystem.reset(new LoggerSys);
 		m_loggerSystem->start();
 		
 		// Reset and start timer
-		m_timer.reset(new miliTimer);
+		m_timer.reset(new MiliTimer);
 		m_timer->start();
 
-		m_timerSeconds.reset(new secondsTimer);
+		m_timerSeconds.reset(new SecondsTimer);
 		m_timerSeconds->start();
 	}
 
@@ -38,9 +38,9 @@ namespace Engine {
 		float timestep = 0.f;
 		float timeSeconds = 0.f;
 		int seconds = 0;
-		loggerSys::info("Application is starting.");
-		loggerSys::file("Application is starting. One");
-		loggerSys::file("Application is starting. Two");
+		LoggerSys::info("Application is starting.");
+		LoggerSys::file("Application is starting. One");
+		LoggerSys::file("Application is starting. Two");
 		while (m_running)
 		{
 			timestep = m_timer->getElapsedTime();
@@ -50,11 +50,11 @@ namespace Engine {
 
 			if (timeSeconds >= 1) { // Check if second passed, if yes output how many seconds passed in total.
 				seconds++;
-				loggerSys::trace("{0} seconds elapsed", seconds);
+				LoggerSys::trace("{0} seconds elapsed", seconds);
+				LoggerSys::trace("FPS {0}", 1.0f / timestep);
 				timeSeconds = 0;
 				m_timerSeconds->reset();
 			}
-			// loggerSys::trace("FPS {0}", 1.0f / timestep);
 		};
 	}
 

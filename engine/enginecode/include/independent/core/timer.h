@@ -8,7 +8,7 @@ namespace Engine {
 	Class that provides time keeping for engine
 	*/
 
-	class timer {
+	class Timer {
 	public:
 		virtual void start() = 0; //!< Starting the timer
 		virtual void reset() = 0; //!< Reset the timer
@@ -16,11 +16,11 @@ namespace Engine {
 	};
 
 	/**
-	\class miliTimer
+	\class MiliTimer
 	Class that provides millisecond time keeping for the engine
 	*/
 
-	class miliTimer : public timer {
+	class MiliTimer : public Timer {
 	private:
 		std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
 		std::chrono::time_point<std::chrono::high_resolution_clock> m_endTime;
@@ -37,11 +37,11 @@ namespace Engine {
 	};
 
 	/**
-	\class secondsTimer
+	\class SecondsTimer
 	Class that provides seconds time keeping for the engine
 	*/
 
-	class secondsTimer : public timer {
+	class SecondsTimer : public Timer {
 	private:
 		std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
 		std::chrono::time_point<std::chrono::high_resolution_clock> m_endTime;

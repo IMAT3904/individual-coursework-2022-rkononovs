@@ -1,13 +1,13 @@
-/** \file loggerSys.cpp */
+/** \file LoggerSys.cpp */
 #include "engine_pch.h"
 #include "systems/loggerSys.h"
 #include <direct.h>
 
 namespace Engine {
-	std::shared_ptr<spdlog::logger> loggerSys::s_consoleLogger = nullptr;
-	std::shared_ptr<spdlog::logger> loggerSys::s_fileLogger = nullptr;
+	std::shared_ptr<spdlog::logger> LoggerSys::s_consoleLogger = nullptr;
+	std::shared_ptr<spdlog::logger> LoggerSys::s_fileLogger = nullptr;
 
-	void Engine::loggerSys::start(SystemSignal init, ...)
+	void Engine::LoggerSys::start(SystemSignal init, ...)
 	{
 		spdlog::set_pattern("%^[%T]: %v%$");
 		spdlog::set_level(spdlog::level::trace);
@@ -29,8 +29,8 @@ namespace Engine {
 			s_consoleLogger->error("Could not start file logger: {0}", e.what());
 			s_fileLogger.reset();
 		}
-		catch (std::exception& e) {
-			s_consoleLogger->error("Uncalled error");
-		}
+		//catch (std::exception& e) {
+		//	s_consoleLogger->error("Uncalled error");
+		//}
 	}
 }
