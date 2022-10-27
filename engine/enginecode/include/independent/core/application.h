@@ -25,8 +25,9 @@ namespace Engine {
 		Application(); //!< Constructor
 
 		std::shared_ptr<LoggerSys> m_loggerSystem; //!< Logger for system logging
-		std::shared_ptr<Timer> m_timer; //!< Timer for keeping the time in the engine
-		std::shared_ptr<Timer> m_timerSeconds;
+		std::shared_ptr<Timer> m_timer; //!< Timer for keeping the time in the engine in milliseconds
+		std::shared_ptr<Timer> m_timerSeconds; //!< Timer for keeping the time in engine in seconds
+		std::shared_ptr<System> m_windowsSystem; //!< Window system
 
 		bool onClose(WindowCloseEvent& e);
 	public:

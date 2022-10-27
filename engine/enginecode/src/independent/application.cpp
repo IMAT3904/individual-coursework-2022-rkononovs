@@ -4,6 +4,10 @@
 #include "engine_pch.h"
 #include "core/application.h"
 
+#ifdef NG_PLATFORM_WINDOWS
+#include "platform/GLFW/GLFWSystem.h"
+#endif
+
 namespace Engine {
 	// Set static vars
 	Application* Application::s_instance = nullptr;
@@ -25,6 +29,12 @@ namespace Engine {
 		m_timerSeconds.reset(new SecondsTimer);
 		m_timerSeconds->start();
 
+		// Start the windows system
+#ifdef NG_PLATFORM_WINDOWS
+		m_windowsSystem.reset(new GLFWSystem);
+#endif
+		m_windowsSystem->start();
+
 		m_handler.setOnCloseCallback(std::bind(&Application::onClose, this, std::placeholders::_1));
 	}
 
@@ -37,8 +47,10 @@ namespace Engine {
 
 	Application::~Application()
 	{
-		//Stop logger
+		// Stop logger
 		//m_loggerSystem->stop();
+		// Stop window system
+		m_windowsSystem->stop();
 	}
 
 
