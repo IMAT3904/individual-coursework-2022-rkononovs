@@ -54,19 +54,19 @@ namespace Engine {
 		void setOnMouseWheelCallback(const std::function<bool(MouseScrolledEvent&)>& fn) { m_onMouseWheelFunction = fn; };
 
 		std::function<bool(WindowCloseEvent&)>& getOnCloseFunction() { return m_onCloseFunction; }
-		std::function<bool(WindowCloseEvent&)>& getOnResizeFunction() { return m_onResizeFunction; }
-		std::function<bool(WindowCloseEvent&)>& getOnFocusFunction() { return m_onFocusFunction; }
-		std::function<bool(WindowCloseEvent&)>& getOnLostFocusFunction() { return m_onLostFocusFunction; }
-		std::function<bool(WindowCloseEvent&)>& getOnWindowMovedFunction() { return m_onMovedFunction; }
+		std::function<bool(WindowResizeEvent&)>& getOnResizeFunction() { return m_onResizeFunction; }
+		std::function<bool(WindowFocusEvent&)>& getOnFocusFunction() { return m_onFocusFunction; }
+		std::function<bool(WindowLostFocusEvent&)>& getOnLostFocusFunction() { return m_onLostFocusFunction; }
+		std::function<bool(WindowMovedEvent&)>& getOnWindowMovedFunction() { return m_onMovedFunction; }
 
-		std::function<bool(WindowCloseEvent&)>& getOnKeyPressedFunction() { return m_onKeyPressedFunction; }
-		std::function<bool(WindowCloseEvent&)>& getOnKeyReleasedFunction() { return m_onKeyReleasedFunction; }
-		std::function<bool(WindowCloseEvent&)>& getOnKeyTypedFunction() { return m_onKeyTypedFunction; }
+		std::function<bool(KeyPressedEvent&)>& getOnKeyPressedFunction() { return m_onKeyPressedFunction; }
+		std::function<bool(KeyReleasedEvent&)>& getOnKeyReleasedFunction() { return m_onKeyReleasedFunction; }
+		std::function<bool(KeyTypedEvent&)>& getOnKeyTypedFunction() { return m_onKeyTypedFunction; }
 
-		std::function<bool(WindowCloseEvent&)>& getOnMouseDownFunction() { return m_onMouseDownFunction; }
-		std::function<bool(WindowCloseEvent&)>& getOnMouseUpFunction() { return m_onMouseUpFunction; }
-		std::function<bool(WindowCloseEvent&)>& getOnMouseMovedFunction() { return m_onMouseMovedFunction; }
-		std::function<bool(WindowCloseEvent&)>& getOnMouseWheelFunction() { return m_onMouseWheelFunction; }
+		std::function<bool(MouseButtonPressedEvent&)>& getOnMouseDownFunction() { return m_onMouseDownFunction; }
+		std::function<bool(MouseButtonReleasedEvent&)>& getOnMouseUpFunction() { return m_onMouseUpFunction; }
+		std::function<bool(MouseMovedEvent&)>& getOnMouseMovedFunction() { return m_onMouseMovedFunction; }
+		std::function<bool(MouseScrolledEvent&)>& getOnMouseWheelFunction() { return m_onMouseWheelFunction; }
 
 		// TODO: Renam all "function's" to callback's
 	};
