@@ -24,6 +24,15 @@ namespace Engine {
 
 		m_timerSeconds.reset(new SecondsTimer);
 		m_timerSeconds->start();
+
+		m_handler.setOnCloseCallback(std::bind(&Application::onClose, this, std::placeholders::_1));
+	}
+
+	bool Application::onClose(WindowCloseEvent& e)
+	{
+		e.handle(true);
+		m_running = false;
+		return e.handled();
 	}
 
 	Application::~Application()
@@ -59,8 +68,13 @@ namespace Engine {
 			if (seconds > 5) {
 				WindowResizeEvent resize(800, 600);
 			}
+
+
 			if (seconds > 8) {
-				WindowCloseEvent close();
+				WindowCloseEvent close;
+
+				auto& callback = m_handler.getOnCloseFunction();
+				callback(close);
 			}
 		};
 	}
