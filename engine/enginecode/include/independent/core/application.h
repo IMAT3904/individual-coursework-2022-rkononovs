@@ -5,7 +5,7 @@
 #include "systems/loggerSys.h"
 #include "core/timer.h"
 #include "events/events.h"
-#include "events/eventHandler.h"
+// #include "events/eventHandler.h"
 #include "core/window.h"
 
 namespace Engine {
@@ -21,7 +21,7 @@ namespace Engine {
 	private:
 		static Application* s_instance; //!< Singleton instance of the application
 		bool m_running = true; //!< Is the application running?
-		EventHandler m_handler; //!< Event handler 
+		// EventHandler m_handler; //!< Event handler 
 	protected:
 		Application(); //!< Constructor
 
@@ -31,7 +31,12 @@ namespace Engine {
 		std::shared_ptr<System> m_windowsSystem; //!< Window system
 		std::shared_ptr<Window> m_window; //!< Window
 
-		bool onClose(WindowCloseEvent& e);
+		bool onClose(WindowCloseEvent& e); //!< Run when the window closes
+		bool onResize(WindowResizeEvent& e); //!< Run when the window is resized
+
+		bool onKeyPressed(KeyPressedEvent& e); //!< 
+		bool onKeyReleased(KeyReleasedEvent& e);
+
 	public:
 		virtual ~Application(); //!< Deconstructor
 		inline static Application& getInstance() { return *s_instance; } //!< Instance getter from singleton pattern

@@ -38,13 +38,34 @@ namespace Engine {
 		WindowProperties props("My Game Engine", 1044, 800);
 		m_window.reset(Window::create(props));
 
-		m_handler.setOnCloseCallback(std::bind(&Application::onClose, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnCloseCallback(std::bind(&Application::onClose, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnResizeCallback(std::bind(&Application::onResize, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnKeyPressedCallback(std::bind(&Application::onKeyPressed, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnKeyReleasedCallback(std::bind(&Application::onKeyReleased, this, std::placeholders::_1));
 	}
 
 	bool Application::onClose(WindowCloseEvent& e)
 	{
 		e.handle(true);
 		m_running = false;
+		return e.handled();
+	}
+
+	bool Application::onResize(WindowResizeEvent& e)
+	{
+		e.handle(true);
+		LoggerSys::info("Window resize event: ({0}, {1})", e.getWidth(), e.getHeight());
+		return e.handled();
+	}
+
+	bool Application::onKeyPressed(KeyPressedEvent& e) {
+		e.handle(true);
+		LoggerSys::info("Key pressed event: key: {0}, repeat: {1}", e.getKeyCode(), e.getRepeatCount());
+		return e.handled();
+	}
+	bool Application::onKeyReleased(KeyReleasedEvent& e) {
+		e.handle(true);
+		LoggerSys::info("Key released event: key: {0}", e.getKeyCode());
 		return e.handled();
 	}
 
@@ -71,6 +92,7 @@ namespace Engine {
 			m_timer->reset();
 			timeSeconds = m_timerSeconds->getElapsedTime();
 
+			m_window->onUpdate(timestep);
 
 			if (timeSeconds >= 1) { // Check if second passed, if yes output how many seconds passed in total.
 				seconds++;
@@ -82,14 +104,6 @@ namespace Engine {
 
 			if (seconds > 5) {
 				WindowResizeEvent resize(800, 600);
-			}
-
-
-			if (seconds > 8) {
-				WindowCloseEvent close;
-
-				auto& callback = m_handler.getOnCloseFunction();
-				callback(close);
 			}
 		};
 	}

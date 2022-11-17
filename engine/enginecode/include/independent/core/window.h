@@ -19,6 +19,7 @@ namespace Engine {
 
 	class Window {
 	protected:
+		EventHandler m_handler; //!< Event Handler
 		//std::shared_ptr<GraphicsContext> m_context;
 	public:
 		virtual void init(const WindowProperties& properties) = 0;
@@ -34,10 +35,12 @@ namespace Engine {
 		virtual unsigned int getWidth() const = 0;
 		virtual unsigned int getHeight() const = 0;
 
-		virtual void* getNativeWidnow() const = 0;
+		virtual void* getNativeWindow() const = 0;
 
 		virtual bool isFullScreenMode() const = 0;
 		virtual bool isVsync() const = 0;
+
+		inline EventHandler& getEventHandler() { return m_handler; }
 
 		static Window* create(const WindowProperties& properties = WindowProperties());
 	};
