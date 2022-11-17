@@ -24,16 +24,19 @@ namespace Engine {
 		
 		// Reset and start timer
 		m_timer.reset(new MiliTimer);
-		m_timer->start();
-
 		m_timerSeconds.reset(new SecondsTimer);
+
 		m_timerSeconds->start();
+		m_timer->start();
 
 		// Start the windows system
 #ifdef NG_PLATFORM_WINDOWS
 		m_windowsSystem.reset(new GLFWSystem);
 #endif
 		m_windowsSystem->start();
+
+		WindowProperties props("My Game Engine", 1044, 800);
+		m_window.reset(Window::create(props));
 
 		m_handler.setOnCloseCallback(std::bind(&Application::onClose, this, std::placeholders::_1));
 	}

@@ -6,6 +6,7 @@
 #include "core/timer.h"
 #include "events/events.h"
 #include "events/eventHandler.h"
+#include "core/window.h"
 
 namespace Engine {
 
@@ -28,6 +29,7 @@ namespace Engine {
 		std::shared_ptr<Timer> m_timer; //!< Timer for keeping the time in the engine in milliseconds
 		std::shared_ptr<Timer> m_timerSeconds; //!< Timer for keeping the time in engine in seconds
 		std::shared_ptr<System> m_windowsSystem; //!< Window system
+		std::shared_ptr<Window> m_window; //!< Window
 
 		bool onClose(WindowCloseEvent& e);
 	public:

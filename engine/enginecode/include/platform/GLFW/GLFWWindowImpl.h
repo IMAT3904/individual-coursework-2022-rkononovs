@@ -4,16 +4,17 @@
 #include "core/window.h"
 #include <GLFW/glfw3.h>
 
-	/** \class GLFWwindowImpl
+	/** \class GLFWWindowImpl
 	* Implementation of a window using GLFW
 	*/
 namespace Engine {
-	class GLFWindowImpl : public Window {
+	class GLFWWindowImpl : public Window {
 	private:
 		WindowProperties m_props; //!< Properties of the window
 		GLFWwindow* m_native; //!< Native GLFW window
+		float m_aspectRation; //!< Windows aspect ratio
 	public:
-		GLFWindowImpl(const WindowProperties& properties); //!< Constructor 
+		GLFWWindowImpl(const WindowProperties& properties); //!< Constructor 
 		
 		virtual void init(const WindowProperties& properties) override; //!< Initialise the window
 		virtual void close() override; //!< Close the window
