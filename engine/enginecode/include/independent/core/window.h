@@ -2,6 +2,7 @@
 #pragma once
 
 #include "events/eventHandler.h"
+#include "core/graphicsContext.h"
 namespace Engine {
 	/** \class Window
 	* Abstract window base class.
@@ -20,7 +21,7 @@ namespace Engine {
 	class Window {
 	protected:
 		EventHandler m_handler; //!< Event Handler
-		//std::shared_ptr<GraphicsContext> m_context;
+		std::shared_ptr<GraphicsContext> m_graphicsContext;
 	public:
 		virtual void init(const WindowProperties& properties) = 0;
 		virtual void close() = 0;

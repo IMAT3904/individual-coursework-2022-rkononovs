@@ -2,6 +2,8 @@
 */
 
 #include "engine_pch.h"
+#include <glad/glad.h>
+
 #include "core/application.h"
 
 #ifdef NG_PLATFORM_WINDOWS
@@ -84,6 +86,10 @@ namespace Engine {
 		float timestep = 0.f;
 		float timeSeconds = 0.f;
 		int seconds = 0;
+
+		glEnable(GL_DEPTH);
+		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+
 		LoggerSys::info("Application is starting.");
 		LoggerSys::file("Application is starting. One");
 		LoggerSys::file("Application is starting. Two");
@@ -95,6 +101,7 @@ namespace Engine {
 
 			m_window->onUpdate(timestep);
 
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			if (timeSeconds >= 1) { // Check if second passed, if yes output how many seconds passed in total.
 				seconds++;
 				LoggerSys::trace("{0} seconds elapsed", seconds);
