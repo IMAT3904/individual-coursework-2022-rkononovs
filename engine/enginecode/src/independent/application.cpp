@@ -463,10 +463,6 @@ namespace Engine {
 
 		int width, height, channels;
 
-		/* Need to add
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-*/
 		std::string letterCube = "assets/textures/letterCube.png";
 		unsigned char* data = stbi_load(letterCube.c_str(), &width, &height, &channels, 0);
 		if (data)
