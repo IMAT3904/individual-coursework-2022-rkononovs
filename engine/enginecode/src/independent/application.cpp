@@ -47,9 +47,18 @@ namespace Engine {
 
 		m_window->getEventHandler().setOnCloseCallback(std::bind(&Application::onClose, this, std::placeholders::_1));
 		m_window->getEventHandler().setOnResizeCallback(std::bind(&Application::onResize, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnFocusCallback(std::bind(&Application::onFocus, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnLostFocusCallback(std::bind(&Application::onLostFocus, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnWindowMovedCallback(std::bind(&Application::onWindowMoved, this, std::placeholders::_1));
 		                                                                                                                                                                                                                                                                             
 		m_window->getEventHandler().setOnKeyPressedCallback(std::bind(&Application::onKeyPressed, this, std::placeholders::_1));
 		m_window->getEventHandler().setOnKeyReleasedCallback(std::bind(&Application::onKeyReleased, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnKeyTypedCallback(std::bind(&Application::onKeyTyped, this, std::placeholders::_1));
+
+		m_window->getEventHandler().setOnMouseDownCallback(std::bind(&Application::onMouseButtonPressed, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnMouseUpCallback(std::bind(&Application::onMouseButtonReleased, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnMouseMovedCallback(std::bind(&Application::onMouseMoved, this, std::placeholders::_1));
+		m_window->getEventHandler().setOnMouseWheelCallback(std::bind(&Application::onMouseScrolled, this, std::placeholders::_1));
 	}
 
 	bool Application::onClose(WindowCloseEvent& e)
@@ -66,6 +75,27 @@ namespace Engine {
 		return e.handled();
 	}
 
+	bool Application::onFocus(WindowFocusEvent& e)
+	{
+		e.handle(true);
+		LoggerSys::info("Window on focus");
+		return e.handled();
+	}
+
+	bool Application::onLostFocus(WindowLostFocusEvent& e)
+	{
+		e.handle(true);
+		LoggerSys::info("Window lost focus");
+		return e.handled();
+	}
+
+	bool Application::onWindowMoved(WindowMovedEvent& e)
+	{
+		e.handle(true);
+		LoggerSys::info("Window moved to: ({0}, {1})", e.getXPos(), e.getYPos());
+		return e.handled();
+	}
+
 	bool Application::onKeyPressed(KeyPressedEvent& e) {
 		e.handle(true);
 		LoggerSys::info("Key pressed event: key: {0}, repeat: {1}", e.getKeyCode(), e.getRepeatCount());
@@ -74,6 +104,41 @@ namespace Engine {
 	bool Application::onKeyReleased(KeyReleasedEvent& e) {
 		e.handle(true);
 		LoggerSys::info("Key released event: key: {0}", e.getKeyCode());
+		return e.handled();
+	}
+
+	bool Application::onKeyTyped(KeyTypedEvent& e)
+	{
+		e.handle(true);
+		// How to log that? What does typed even do?
+		return e.handled();
+	}
+
+	bool Application::onMouseButtonPressed(MouseButtonPressedEvent& e)
+	{
+		e.handle(true);
+		LoggerSys::info("Mouse button {0} pressed", e.getButton());
+		return e.handled();
+	}
+
+	bool Application::onMouseButtonReleased(MouseButtonReleasedEvent& e)
+	{
+		e.handle(true);
+		LoggerSys::info("Mouse button {0} released", e.getButton());
+		return e.handled();
+	}
+
+	bool Application::onMouseMoved(MouseMovedEvent& e)
+	{
+		e.handle(true);
+		LoggerSys::info("Mouse moved by {0} x and {1} y.", e.getX(), e.getY());
+		return e.handled();
+	}
+
+	bool Application::onMouseScrolled(MouseScrolledEvent& e)
+	{
+		e.handle(true);
+		LoggerSys::info("Mouse scrolled by {0} x and {1} y.", e.getXOffset(), e.getYOffset());
 		return e.handled();
 	}
 

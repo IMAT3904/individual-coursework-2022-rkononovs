@@ -39,7 +39,7 @@ namespace Engine {
 
 	class MouseButtonPressedEvent : public MouseEvent {
 	private:
-		int m_button; // Why is it INT ? Maybe later change to bool
+		int m_button;
 	public:
 		MouseButtonPressedEvent(int button) : m_button(button) {}
 
@@ -51,7 +51,7 @@ namespace Engine {
 
 	class MouseButtonReleasedEvent : public MouseEvent {
 	private:
-		int m_button; // Why is it INT ? Maybe later change to bool
+		int m_button;
 	public:
 		MouseButtonReleasedEvent(int button) : m_button(button) {}
 
