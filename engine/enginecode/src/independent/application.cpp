@@ -59,6 +59,8 @@ namespace Engine {
 		m_window->getEventHandler().setOnMouseUpCallback(std::bind(&Application::onMouseButtonReleased, this, std::placeholders::_1));
 		m_window->getEventHandler().setOnMouseMovedCallback(std::bind(&Application::onMouseMoved, this, std::placeholders::_1));
 		m_window->getEventHandler().setOnMouseWheelCallback(std::bind(&Application::onMouseScrolled, this, std::placeholders::_1));
+
+		InputPoller::setNativeWindow(m_window->getNativeWindow());
 	}
 
 	bool Application::onClose(WindowCloseEvent& e)
@@ -138,7 +140,7 @@ namespace Engine {
 	bool Application::onMouseScrolled(MouseScrolledEvent& e)
 	{
 		e.handle(true);
-		LoggerSys::info("Mouse scrolled by {0} x and {1} y.", e.getXOffset(), e.getYOffset());
+		LoggerSys::info("Mouse scrolled by {0} y.", e.getYOffset());
 		return e.handled();
 	}
 
@@ -601,6 +603,8 @@ namespace Engine {
 			m_timer->reset();
 			timeSeconds = m_timerSeconds->getElapsedTime();
 
+			if (InputPoller::isKeyPressed(NG_KEY_W)) LoggerSys::error("W has been pressed"); 
+			if (InputPoller::isMouseButtonPressed(NG_MOUSE_BUTTON_1)) LoggerSys::error("Left mouse button has been pressed");
 
 			// Do frame stuff
 			for (auto& model : models) { model = glm::rotate(model, timestep, glm::vec3(0.f, 1.0, 0.f)); }

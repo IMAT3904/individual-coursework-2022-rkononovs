@@ -5,8 +5,8 @@
 #include "systems/loggerSys.h"
 #include "core/timer.h"
 #include "events/events.h"
-// #include "events/eventHandler.h"
 #include "core/window.h"
+#include "core/inputPoller.h"
 
 namespace Engine {
 
@@ -49,6 +49,7 @@ namespace Engine {
 	public:
 		virtual ~Application(); //!< Deconstructor
 		inline static Application& getInstance() { return *s_instance; } //!< Instance getter from singleton pattern
+		inline std::shared_ptr<Window>& getWindow() { return m_window; } //!< Window getter
 		void run(); //!< Main loop
 	};
 
