@@ -15,6 +15,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "platform/OpenGL/OpenGLVertexArray.h"
+#include "platform/OpenGL/OpenGLShader.h"
 
 namespace Engine {
 	// Set static vars
@@ -282,6 +283,11 @@ namespace Engine {
 
 
 #pragma region SHADERS
+
+		std::shared_ptr<OpenGLShader> FCShader;
+		//FCShader.reset(new OpenGLShader("./assets/shaders/flatColour.glsl"));
+		FCShader.reset(new OpenGLShader("./assets/shaders/flatColour.vert", "/assets/shaders/flatColour.frag"));
+
 		std::string FCvertSrc = R"(
 				#version 440 core
 			
