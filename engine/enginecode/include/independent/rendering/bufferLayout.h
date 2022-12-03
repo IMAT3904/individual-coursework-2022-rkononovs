@@ -14,8 +14,8 @@ namespace Engine {
 	class BufferElement {
 	public:
 		ShaderDataType m_dataType; //!< The type of data
-		int m_size; //!< The size of data
-		int m_offset; //!< The offset of data
+		uint32_t m_size; //!< The size of data
+		uint32_t m_offset; //!< The offset of data
 		bool m_normalized; //!< Normalization of data
 
 		BufferElement() {} //!< Default constructor
@@ -32,32 +32,16 @@ namespace Engine {
 	class BufferLayout {
 	private:
 		std::vector<BufferElement> m_elements; //!< Buffer elements
-		int m_stride; //!< Width in bytes of the buffer line
+		uint32_t m_stride; //!< Width in bytes of the buffer line
 		void calcStrideAndOffset(); //!< Calculate stride and offsets based on elements 
 	public:
 		BufferLayout() {};
 		BufferLayout(const std::initializer_list<BufferElement>& element) : m_elements(element) { calcStrideAndOffset(); }
-		inline int getStride() { return m_stride; }
+		inline uint32_t getStride() const { return m_stride; }
 		void addElement(BufferElement element);
 		inline std::vector<BufferElement>::iterator begin() { return m_elements.begin(); }
 		inline std::vector<BufferElement>::iterator end() { return m_elements.end(); }
 		inline std::vector<BufferElement>::const_iterator begin() const { return m_elements.begin(); }
 		inline std::vector<BufferElement>::const_iterator end() const { return m_elements.end(); }
 	};
-
-	void BufferLayout::addElement(BufferElement element) {
-		m_elements.push_back(element);
-		calcStrideAndOffset();
-	}
-
-	void BufferLayout::calcStrideAndOffset() {
-		int offset = 0;
-
-		for (auto& element : m_elements) {
-			element.m_offset = offset;
-			offset += element.m_size;
-		}
-
-		m_stride = offset;
-	}
 }
