@@ -67,7 +67,7 @@ namespace Engine {
 		compileAndLink(src[Region::Vertex].c_str(), src[Region::Fragment].c_str());
 	}
 	OpenGLShader::~OpenGLShader(){
-		glDeleteShader(m_OpenGL_ID);
+		glDeleteProgram(m_OpenGL_ID);
 	}
 	void OpenGLShader::uploadInt(const char* name, int value){
 		uint32_t uniformLocation = glGetUniformLocation(m_OpenGL_ID, name);
