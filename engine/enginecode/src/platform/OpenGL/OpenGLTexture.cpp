@@ -11,21 +11,20 @@
 #include "stb_image.h"
 
 namespace Engine {
-	OpenGLTexture::OpenGLTexture(const char* filepath){
+	OpenGLTexture::OpenGLTexture(const char* filepath, uint32_t slot){
 		int width, height, channels;
 
 		unsigned char* data = stbi_load(filepath, &width, &height, &channels, 0);
 
-		if (data) init(width, height, channels, data); else LoggerSys::error("Cannot load file {0}", filepath);
+		if (data) init(width, height, channels, data, slot); else LoggerSys::error("Cannot load file {0}", filepath);
 
 		stbi_image_free(data);
 	}
-	OpenGLTexture::OpenGLTexture(uint32_t width, uint32_t height, uint32_t channels, unsigned char* data){
-		if (data) init(width, height, channels, data); else LoggerSys::error("Cannot load data");
+	OpenGLTexture::OpenGLTexture(uint32_t width, uint32_t height, uint32_t channels, unsigned char* data, uint32_t slot){
+		if (data) init(width, height, channels, data, slot); else LoggerSys::error("Cannot load data");
 	}
 	OpenGLTexture::~OpenGLTexture(){
 		glDeleteTextures(1, &m_OpenGL_ID);
-		m_textureAmount--;
 	}
 	void OpenGLTexture::edit(uint32_t xOffset, uint32_t yOffset, uint32_t width, uint32_t height, unsigned char* data){
 		glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
@@ -40,9 +39,15 @@ namespace Engine {
 		}
 	}
 
-	void OpenGLTexture::init(uint32_t width, uint32_t height, uint32_t channels, unsigned char* data) {
+	void OpenGLTexture::bindToSlot(uint32_t slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
+	}
+
+	void OpenGLTexture::init(uint32_t width, uint32_t height, uint32_t channels, unsigned char* data, uint32_t slot) {
 		glGenTextures(1, &m_OpenGL_ID);
-		glActiveTexture(GL_TEXTURE0 + m_textureAmount);
+		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -64,6 +69,5 @@ namespace Engine {
 		m_width = width;
 		m_height = height;
 		m_channels = channels;
-		m_textureAmount++;
 	}
 }

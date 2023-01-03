@@ -18,7 +18,7 @@
 
 namespace Engine {
 	// Set static vars
-	uint32_t OpenGLTexture::m_textureAmount = 0;
+	// uint32_t OpenGLTexture::m_textureAmount = 0;
 	Application* Application::s_instance = nullptr;
 
 	Application::Application()
@@ -296,9 +296,9 @@ namespace Engine {
 #pragma region TEXTURES
 
 		std::shared_ptr<OpenGLTexture> letterTexture;
-		letterTexture.reset(new OpenGLTexture("assets/textures/letterCube.png"));
+		letterTexture.reset(new OpenGLTexture("assets/textures/letterCube.png", 0));
 		std::shared_ptr<OpenGLTexture> numberTexture;
-		numberTexture.reset(new OpenGLTexture("assets/textures/numberCube.png"));
+		numberTexture.reset(new OpenGLTexture("assets/textures/numberCube.png", 1));
 
 #pragma endregion
 
