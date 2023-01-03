@@ -18,6 +18,7 @@
 
 namespace Engine {
 	// Set static vars
+	uint32_t OpenGLTexture::m_textureAmount = 0;
 	Application* Application::s_instance = nullptr;
 
 	Application::Application()
