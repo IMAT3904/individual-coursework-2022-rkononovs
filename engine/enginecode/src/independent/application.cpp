@@ -286,7 +286,7 @@ namespace Engine {
 
 		std::shared_ptr<OpenGLShader> FCShader;
 		//FCShader.reset(new OpenGLShader("./assets/shaders/flatColour.glsl"));
-		FCShader.reset(new OpenGLShader("./assets/shaders/flatColour.vert", "/assets/shaders/flatColour.frag"));
+		FCShader.reset(new OpenGLShader("./assets/shaders/flatColour.vert", "./assets/shaders/flatColour.frag"));
 
 		std::string FCvertSrc = R"(
 				#version 440 core

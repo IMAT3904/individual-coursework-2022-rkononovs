@@ -15,7 +15,7 @@ namespace Engine {
 
 		std::fstream handle(vertexFilepath, std::ios::in);
 		if (handle.is_open()) {
-			while (getline(handle, line)) { vertexSrc += line; }
+			while (getline(handle, line)) { vertexSrc +=  (line + "\n");}
 		}
 		else {
 			LoggerSys::error("Could not open vertex shader source: {0}", vertexFilepath);
@@ -26,10 +26,10 @@ namespace Engine {
 
 		handle.open(fragmentFilepath, std::ios::in);
 		if (handle.is_open()) {
-			while (getline(handle, line)) { fragmentSrc += line; }
+			while (getline(handle, line)) { fragmentSrc += (line + "\n");}
 		}
 		else {
-			LoggerSys::error("Could not open vertex shader source: {0}", fragmentFilepath);
+			LoggerSys::error("Could not open fragment shader source: {0}", fragmentFilepath);
 			return;
 		}
 		handle.close();
@@ -57,7 +57,7 @@ namespace Engine {
 			}
 		}
 		else {
-			LoggerSys::error("Could not open vertex shader source: {0}", filepath);
+			LoggerSys::error("Could not open shader source: {0}", filepath);
 			return;
 		}
 		handle.close();
