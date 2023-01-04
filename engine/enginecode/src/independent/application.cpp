@@ -249,14 +249,14 @@ namespace Engine {
 
 		cubeVAO.reset(new OpenGLVertexArray);
 
-		BufferLayout cubeBL = { ShaderDataType::Float3, ShaderDataType::Float3, ShaderDataType::Float2};
+		VertexBufferLayout cubeBL = { ShaderDataType::Float3, ShaderDataType::Float3, ShaderDataType::Float2 };
 		cubeVBO.reset(new OpenGLVertexBuffer(cubeVertices, sizeof(cubeVertices), cubeBL));
 
 		cubeIBO.reset(new OpenGLIndexBuffer(cubeIndices, 36));
 
 		cubeVAO->addVertexBuffer(cubeVBO);
 		cubeVAO->setIndexBuffer(cubeIBO);
-		
+
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -267,7 +267,7 @@ namespace Engine {
 
 		pyramidVAO.reset(new OpenGLVertexArray);
 
-		BufferLayout pyramidBL = { ShaderDataType::Float3, ShaderDataType::Float3 };
+		VertexBufferLayout pyramidBL = { ShaderDataType::Float3, ShaderDataType::Float3 };
 		pyramidVBO.reset(new OpenGLVertexBuffer(pyramidVertices, sizeof(pyramidVertices), pyramidBL));
 
 		pyramidIBO.reset(new OpenGLIndexBuffer(pyramidIndices, 18));
@@ -312,12 +312,12 @@ namespace Engine {
 		// Camera UBO
 		uint32_t blockNumber = 0;
 		uint32_t cameraUBO;
-		uint32_t cameraDataSize = sizeof(glm::mat4) * 2;
+		UniformBufferLayout camLayout = { { "u_projection", ShaderDataType::Mat4}, {"u_view", ShaderDataType::Mat4} };
 
 		glGenBuffers(1, &cameraUBO);
 		glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
-		glBufferData(GL_UNIFORM_BUFFER, cameraDataSize, nullptr, GL_DYNAMIC_DRAW);
-		glBindBufferRange(GL_UNIFORM_BUFFER, blockNumber, cameraUBO, 0, cameraDataSize);
+		glBufferData(GL_UNIFORM_BUFFER, camLayout.getStride(), nullptr, GL_DYNAMIC_DRAW);
+		glBindBufferRange(GL_UNIFORM_BUFFER, blockNumber, cameraUBO, 0, camLayout.getStride());
 
 		uint32_t blockIndex = glGetUniformBlockIndex(FCShader->getRenderID(), "b_camera");
 		glUniformBlockBinding(FCShader->getRenderID(), blockIndex, blockNumber);
@@ -325,8 +325,10 @@ namespace Engine {
 		blockIndex = glGetUniformBlockIndex(TPShader->getRenderID(), "b_camera");
 		glUniformBlockBinding(TPShader->getRenderID(), blockIndex, blockNumber);
 
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
-		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+		auto element = *camLayout.begin();
+		glBufferSubData(GL_UNIFORM_BUFFER, element.m_offset, element.m_size, glm::value_ptr(projection));
+		element = *(camLayout.begin() + 1);
+		glBufferSubData(GL_UNIFORM_BUFFER, element.m_offset, element.m_size, glm::value_ptr(view));
 
 		blockNumber++;
 		glm::vec3 lightColour(1.f, 1.f, 1.f);
