@@ -16,6 +16,7 @@
 #include "platform/OpenGL/OpenGLShader.h"
 #include "platform/OpenGL/OpenGLTexture.h"
 #include "platform/OpenGL/OpenGLUniformBuffer.h"
+#include "rendering/TextureUnitManager.h"
 
 namespace Engine {
 	// Set static vars
@@ -76,39 +77,39 @@ namespace Engine {
 	bool Application::onResize(WindowResizeEvent& e)
 	{
 		e.handle(true);
-		LoggerSys::info("Window resize event: ({0}, {1})", e.getWidth(), e.getHeight());
+		//LoggerSys::info("Window resize event: ({0}, {1})", e.getWidth(), e.getHeight());
 		return e.handled();
 	}
 
 	bool Application::onFocus(WindowFocusEvent& e)
 	{
 		e.handle(true);
-		LoggerSys::info("Window on focus");
+		//LoggerSys::info("Window on focus");
 		return e.handled();
 	}
 
 	bool Application::onLostFocus(WindowLostFocusEvent& e)
 	{
 		e.handle(true);
-		LoggerSys::info("Window lost focus");
+		//LoggerSys::info("Window lost focus");
 		return e.handled();
 	}
 
 	bool Application::onWindowMoved(WindowMovedEvent& e)
 	{
 		e.handle(true);
-		LoggerSys::info("Window moved to: ({0}, {1})", e.getXPos(), e.getYPos());
+		//LoggerSys::info("Window moved to: ({0}, {1})", e.getXPos(), e.getYPos());
 		return e.handled();
 	}
 
 	bool Application::onKeyPressed(KeyPressedEvent& e) {
 		e.handle(true);
-		LoggerSys::info("Key pressed event: key: {0}, repeat: {1}", e.getKeyCode(), e.getRepeatCount());
+		//LoggerSys::info("Key pressed event: key: {0}, repeat: {1}", e.getKeyCode(), e.getRepeatCount());
 		return e.handled();
 	}
 	bool Application::onKeyReleased(KeyReleasedEvent& e) {
 		e.handle(true);
-		LoggerSys::info("Key released event: key: {0}", e.getKeyCode());
+		//LoggerSys::info("Key released event: key: {0}", e.getKeyCode());
 		return e.handled();
 	}
 
@@ -122,28 +123,28 @@ namespace Engine {
 	bool Application::onMouseButtonPressed(MouseButtonPressedEvent& e)
 	{
 		e.handle(true);
-		LoggerSys::info("Mouse button {0} pressed", e.getButton());
+		//LoggerSys::info("Mouse button {0} pressed", e.getButton());
 		return e.handled();
 	}
 
 	bool Application::onMouseButtonReleased(MouseButtonReleasedEvent& e)
 	{
 		e.handle(true);
-		LoggerSys::info("Mouse button {0} released", e.getButton());
+		//LoggerSys::info("Mouse button {0} released", e.getButton());
 		return e.handled();
 	}
 
 	bool Application::onMouseMoved(MouseMovedEvent& e)
 	{
 		e.handle(true);
-		LoggerSys::info("Mouse moved by {0} x and {1} y.", e.getX(), e.getY());
+		//LoggerSys::info("Mouse moved by {0} x and {1} y.", e.getX(), e.getY());
 		return e.handled();
 	}
 
 	bool Application::onMouseScrolled(MouseScrolledEvent& e)
 	{
 		e.handle(true);
-		LoggerSys::info("Mouse scrolled by {0} y.", e.getYOffset());
+		//LoggerSys::info("Mouse scrolled by {0} y.", e.getYOffset());
 		return e.handled();
 	}
 
@@ -297,8 +298,8 @@ namespace Engine {
 #pragma region TEXTURES
 
 		std::shared_ptr<OpenGLTexture> letterTexture;
-		letterTexture.reset(new OpenGLTexture("assets/textures/letterCube.png", 0));
 		std::shared_ptr<OpenGLTexture> numberTexture;
+		letterTexture.reset(new OpenGLTexture("assets/textures/letterCube.png", 0));
 		numberTexture.reset(new OpenGLTexture("assets/textures/numberCube.png", 1));
 
 #pragma endregion
@@ -353,6 +354,8 @@ namespace Engine {
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
 
+		TextureUnitManager unitManager(32);
+		uint32_t slot;
 
 		float timestep = 0.f;
 		float timeSeconds = 0.f;
@@ -367,8 +370,8 @@ namespace Engine {
 			m_timer->reset();
 			timeSeconds = m_timerSeconds->getElapsedTime();
 
-			if (InputPoller::isKeyPressed(NG_KEY_W)) LoggerSys::error("W has been pressed"); 
-			if (InputPoller::isMouseButtonPressed(NG_MOUSE_BUTTON_1)) LoggerSys::error("Left mouse button has been pressed");
+			//if (InputPoller::isKeyPressed(NG_KEY_W)) LoggerSys::error("W has been pressed"); 
+			//if (InputPoller::isMouseButtonPressed(NG_MOUSE_BUTTON_1)) LoggerSys::error("Left mouse button has been pressed");
 
 			// Do frame stuff
 			for (auto& model : models) { model = glm::rotate(model, timestep, glm::vec3(0.f, 1.0, 0.f)); }
@@ -378,41 +381,29 @@ namespace Engine {
 			glUseProgram(FCShader->getRenderID());
 			glBindVertexArray(pyramidVAO->getRenderID());
 
-			GLuint uniformLocation;
+			//GLuint uniformLocation;
 
-			uniformLocation = glGetUniformLocation(FCShader->getRenderID(), "u_model");
-			glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(models[0])); // Must include <glm/gtc/type_ptr.hpp>
-
-			uniformLocation = glGetUniformLocation(FCShader->getRenderID(), "u_view");
-			glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(view));
-
-			uniformLocation = glGetUniformLocation(FCShader->getRenderID(), "u_projection");
-			glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(projection));
+			FCShader->uploadMat4("u_model", models[0]);
 
 			glDrawElements(GL_TRIANGLES, pyramidVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 
 			glUseProgram(TPShader->getRenderID());
 			glBindVertexArray(cubeVAO->getRenderID());
 
-			uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_model");
-			glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(models[1]));
-
-			uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_view");
-			glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(view));
-
-			uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_projection");
-			glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(projection));
-
-			uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_texData");
-			glUniform1i(uniformLocation, 0);
+			TPShader->uploadMat4("u_model", models[1]);;
+			if (unitManager.getUnit(letterTexture->getRenderID(), slot)) {
+				letterTexture->bindToSlot(slot);
+			}
+			TPShader->uploadInt("u_textData", slot);
 
 			glDrawElements(GL_TRIANGLES, cubeVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 
-			uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_model");
-			glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(models[2]));
+			TPShader->uploadMat4("u_model", models[2]);
 
-			uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_texData");
-			glUniform1i(uniformLocation, 1);
+			if (unitManager.getUnit(numberTexture->getRenderID(), slot)) {
+				numberTexture->bindToSlot(slot);
+			}
+			TPShader->uploadInt("u_textData", slot);
 
 			glDrawElements(GL_TRIANGLES, cubeVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 

@@ -16,7 +16,12 @@ namespace Engine {
 
 		unsigned char* data = stbi_load(filepath, &width, &height, &channels, 0);
 
-		if (data) init(width, height, channels, data, slot); else LoggerSys::error("Cannot load file {0}", filepath);
+		if (data) {
+			init(width, height, channels, data, slot);
+		}
+		else {
+			LoggerSys::error("Cannot load file {0}", filepath);
+		}
 
 		stbi_image_free(data);
 	}
@@ -43,11 +48,13 @@ namespace Engine {
 	{
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
+		LoggerSys::info("Binding texture {0} to slot {1}", m_OpenGL_ID, slot);
 	}
 
 	void OpenGLTexture::init(uint32_t width, uint32_t height, uint32_t channels, unsigned char* data, uint32_t slot) {
 		glGenTextures(1, &m_OpenGL_ID);
 		glActiveTexture(GL_TEXTURE0 + slot);
+		LoggerSys::info("Current slot is: {0}", slot);
 		glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
