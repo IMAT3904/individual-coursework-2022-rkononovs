@@ -5,12 +5,19 @@
 layout(location = 0) in vec3 a_vertexPosition;
 layout(location = 1) in vec3 a_vertexNormal;
 layout(location = 2) in vec2 a_texCoord;
+
 out vec3 fragmentPos;
 out vec3 normal;
 out vec2 texCoord;
+
+layout (std140) uniform b_camera
+{
+	mat4 u_projection;
+	mat4 u_view;
+};
+
 uniform mat4 u_model;
-uniform mat4 u_view;
-uniform mat4 u_projection;
+
 void main()
 {
 	fragmentPos = vec3(u_model * vec4(a_vertexPosition, 1.0));
@@ -27,9 +34,14 @@ layout(location = 0) out vec4 colour;
 in vec3 normal;
 in vec3 fragmentPos;
 in vec2 texCoord;
-uniform vec3 u_lightPos; 
-uniform vec3 u_viewPos; 
-uniform vec3 u_lightColour;
+
+layout (std140) uniform b_lights
+{
+	vec3 u_lightPos; 
+	vec3 u_viewPos; 
+	vec3 u_lightColour;
+};
+
 uniform sampler2D u_texData;
 void main()
 {
