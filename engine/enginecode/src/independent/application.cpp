@@ -392,14 +392,9 @@ namespace Engine {
 			glUseProgram(TPShader->getRenderID());
 			glBindVertexArray(cubeVAO->getRenderID());
 
-			//uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_model");
-			//glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(models[1]));
 			TPShader->uploadMat4("u_model", models[1]);
 			TPShader->uploadMat4("u_view", view);
 			TPShader->uploadMat4("u_projection", projection);
-
-			//uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_texData");
-			//glUniform1i(uniformLocation, 0);
 
 			TPShader->uploadMat4("u_model", models[1]);;
 			if (unitManager.getUnit(letterTexture->getRenderID(), slot)) {
@@ -410,9 +405,6 @@ namespace Engine {
 			glDrawElements(GL_TRIANGLES, cubeVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 
 			TPShader->uploadMat4("u_model", models[2]);
-
-			//uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_texData");
-			//glUniform1i(uniformLocation, 1);
 			
 			if (unitManager.getUnit(numberTexture->getRenderID(), slot)) {
 				numberTexture->bindToSlot(slot);
