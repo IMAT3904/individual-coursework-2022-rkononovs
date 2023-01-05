@@ -194,28 +194,28 @@ namespace Engine {
 				 0.5f, -0.5f, 0.5f,   1.f,  0.f,  0.f,  0.66f, 1.0f
 		};
 
-		float pyramidVertices[6 * 16] = {
-			//	 <------ Pos ------>  <--- colour ---> 
-				-0.5f, -0.5f, -0.5f,  0.8f, 0.2f, 0.8f, //  square Magneta
-				 0.5f, -0.5f, -0.5f,  0.8f, 0.2f, 0.8f,
-				 0.5f, -0.5f,  0.5f,  0.8f, 0.2f, 0.8f,
-				-0.5f, -0.5f,  0.5f,  0.8f, 0.2f, 0.8f,
+		float pyramidVertices[8 * 16] = {
+			//	 <------ Pos ------>   <------ normal ------>    <-- UV -->
+				-0.5f, -0.5f, -0.5f,    0.f,   -1.f,   0.f,      0.f, 0.5f, //  square Magneta
+				 0.5f, -0.5f, -0.5f,    0.f,   -1.f,   0.f,      0.f, 0.5f,
+				 0.5f, -0.5f,  0.5f,    0.f,   -1.f,   0.f,      0.33f, 0.5f,
+				-0.5f, -0.5f,  0.5f,    0.f,   -1.f,   0.f,      0.33f, 0.f,
 
-				-0.5f, -0.5f, -0.5f,  0.2f, 0.8f, 0.2f,  //triangle Green
-				-0.5f, -0.5f,  0.5f,  0.2f, 0.8f, 0.2f,
-				 0.0f,  0.5f,  0.0f,  0.2f, 0.8f, 0.2f,
+				-0.5f, -0.5f, -0.5f,   -0.8944f, 0.4472f, 0.f,   0.f, 0.f,  //triangle Green
+				-0.5f, -0.5f,  0.5f,   -0.8944f, 0.4472f, 0.f,   0.f, 0.f,
+				 0.0f,  0.5f,  0.0f,   -0.8944f, 0.4472f, 0.f,   0.f, 0.f,
 
-				-0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.f, //triangle Red
-				 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.f,
-				 0.0f,  0.5f,  0.0f,  1.0f, 0.0f, 0.f,
+				-0.5f, -0.5f,  0.5f,   0.f, 0.4472f, 0.8944f,    0.f, 0.f,  //triangle Red
+				 0.5f, -0.5f,  0.5f,   0.f, 0.4472f, 0.8944f,    0.f, 0.f,
+				 0.0f,  0.5f,  0.0f,   0.f, 0.4472f, 0.8944f,    0.f, 0.f,
 
-				 0.5f, -0.5f,  0.5f,  0.8f, 0.8f, 0.2f, //  triangle Yellow
-				 0.5f, -0.5f, -0.5f,  0.8f, 0.8f, 0.2f,
-				 0.0f,  0.5f,  0.0f,  0.8f, 0.8f, 0.2f,
+				 0.5f, -0.5f,  0.5f,   0.8944f, 0.4472f, 0.f,    0.f, 0.f,  //triangle Yellow
+				 0.5f, -0.5f, -0.5f,   0.8944f, 0.4472f, 0.f,    0.f, 0.f,
+				 0.0f,  0.5f,  0.0f,   0.8944f, 0.4472f, 0.f,    0.f, 0.f,
 
-				 0.5f, -0.5f, -0.5f,  0.f, 0.2f, 1.0f,//  triangle Blue
-				-0.5f, -0.5f, -0.5f,  0.f, 0.2f, 1.0f,
-				 0.0f,  0.5f,  0.0f,  0.f, 0.2f, 1.0f
+				 0.5f, -0.5f, -0.5f,   0.f, 0.4472f, -0.8944f,   0.f, 0.f, //triangle Blue
+				-0.5f, -0.5f, -0.5f,   0.f, 0.4472f, -0.8944f,   0.f, 0.f,
+				 0.0f,  0.5f,  0.0f,   0.f, 0.4472f, -0.8944f,   0.f, 0.f
 		};
 
 		uint32_t pyramidIndices[3 * 6] =
@@ -269,8 +269,8 @@ namespace Engine {
 
 		pyramidVAO.reset(new OpenGLVertexArray);
 
-		VertexBufferLayout pyramidBL = { ShaderDataType::Float3, ShaderDataType::Float3 };
-		pyramidVBO.reset(new OpenGLVertexBuffer(pyramidVertices, sizeof(pyramidVertices), pyramidBL));
+		//VertexBufferLayout pyramidBL = { ShaderDataType::Float3, ShaderDataType::Float3, ShaderDataType::Float2 };
+		pyramidVBO.reset(new OpenGLVertexBuffer(pyramidVertices, sizeof(pyramidVertices), cubeBL));
 
 		pyramidIBO.reset(new OpenGLIndexBuffer(pyramidIndices, 18));
 
@@ -286,21 +286,19 @@ namespace Engine {
 
 #pragma region SHADERS
 
-		std::shared_ptr<OpenGLShader> FCShader;
-		FCShader.reset(new OpenGLShader("./assets/shaders/flatColour.glsl"));
-		//FCShader.reset(new OpenGLShader("./assets/shaders/flatColour.vert", "./assets/shaders/flatColour.frag"));
-
 		std::shared_ptr<OpenGLShader> TPShader;
 		TPShader.reset(new OpenGLShader("./assets/shaders/texturedPhong.glsl"));
 
 #pragma endregion 
 
 #pragma region TEXTURES
-
+		unsigned char whitePx[4] = { 255, 255, 255, 255 };
+		std::shared_ptr<OpenGLTexture> plainWhiteTexture;
+		plainWhiteTexture.reset(new OpenGLTexture(1, 1, 4, whitePx, 0));
 		std::shared_ptr<OpenGLTexture> letterTexture;
-		letterTexture.reset(new OpenGLTexture("assets/textures/letterCube.png", 0));
+		letterTexture.reset(new OpenGLTexture("assets/textures/letterCube.png", 1));
 		std::shared_ptr<OpenGLTexture> numberTexture;
-		numberTexture.reset(new OpenGLTexture("assets/textures/numberCube.png", 1));
+		numberTexture.reset(new OpenGLTexture("assets/textures/numberCube.png", 2));
 
 #pragma endregion
 
@@ -319,7 +317,6 @@ namespace Engine {
 		std::shared_ptr<OpenGLUniformBuffer> cameraUBO;
 		cameraUBO.reset(new OpenGLUniformBuffer(camLayout));
 
-		cameraUBO->attachShaderBlock(FCShader, "b_camera");
 		cameraUBO->attachShaderBlock(TPShader, "b_camera");
 
 		cameraUBO->uploadData("u_projection", glm::value_ptr(projection));
@@ -330,9 +327,10 @@ namespace Engine {
 		glm::vec3 lightColour(1.f, 1.f, 1.f);
 		glm::vec3 lightPos(1.f, 4.f, 6.f);
 		glm::vec3 viewPos(0.f, 0.f, 0.f);
+		//glm::vec4 tint(0.3f, 0.9f, 4.f, 1.f);
 
 		uint32_t lightsUBO;
-		uint32_t lightsDataSiz = sizeof(glm::vec4) * 3;
+		uint32_t lightsDataSiz = sizeof(glm::vec4) * 4;
 
 		glGenBuffers(1, &lightsUBO);
 		glBindBuffer(GL_UNIFORM_BUFFER, lightsUBO);
@@ -345,6 +343,7 @@ namespace Engine {
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec3), glm::value_ptr(lightPos));
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4), sizeof(glm::vec3), glm::value_ptr(viewPos));
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 2, sizeof(glm::vec3), glm::value_ptr(lightColour));
+		//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 3, sizeof(glm::vec4), glm::value_ptr(tint));
 
 		glm::mat4 models[3];
 		models[0] = glm::translate(glm::mat4(1.0f), glm::vec3(-2.f, 0.f, -6.f));
@@ -378,14 +377,19 @@ namespace Engine {
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glUseProgram(FCShader->getRenderID());
+			glUseProgram(TPShader->getRenderID());
 			glBindVertexArray(pyramidVAO->getRenderID());
 
-			GLuint uniformLocation;
+			TPShader->uploadMat4("u_model", models[0]);
+			TPShader->uploadFloat4("u_tint", { 0.3f, 0.9f, 4.f, 1.f });
 
-			FCShader->uploadMat4("u_model", models[0]);
-			FCShader->uploadMat4("u_view", view);
-			FCShader->uploadMat4("u_projection", projection);
+			if (unitManager.getUnit(plainWhiteTexture->getRenderID(), slot)) {
+				plainWhiteTexture->bindToSlot(slot);
+			}
+
+			TPShader->uploadInt("u_texData", slot);
+			TPShader->uploadMat4("u_view", view);
+			TPShader->uploadMat4("u_projection", projection);
 
 			glDrawElements(GL_TRIANGLES, pyramidVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 
@@ -393,19 +397,18 @@ namespace Engine {
 			glBindVertexArray(cubeVAO->getRenderID());
 
 			TPShader->uploadMat4("u_model", models[1]);
-			TPShader->uploadMat4("u_view", view);
-			TPShader->uploadMat4("u_projection", projection);
+			TPShader->uploadFloat4("u_tint", { 1.f, 1.f, 1.f, 1.f });
 
-			TPShader->uploadMat4("u_model", models[1]);;
 			if (unitManager.getUnit(letterTexture->getRenderID(), slot)) {
 				letterTexture->bindToSlot(slot);
 			}
+
 			TPShader->uploadInt("u_texData", slot);
 
 			glDrawElements(GL_TRIANGLES, cubeVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 
 			TPShader->uploadMat4("u_model", models[2]);
-			
+
 			if (unitManager.getUnit(numberTexture->getRenderID(), slot)) {
 				numberTexture->bindToSlot(slot);
 			}
