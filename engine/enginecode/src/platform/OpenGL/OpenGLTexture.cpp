@@ -16,12 +16,7 @@ namespace Engine {
 
 		unsigned char* data = stbi_load(filepath, &width, &height, &channels, 0);
 
-		if (data) {
-			init(width, height, channels, data, slot);
-		}
-		else {
-			LoggerSys::error("Cannot load file {0}", filepath);
-		}
+		if (data) init(width, height, channels, data, slot); else LoggerSys::error("Cannot load file {0}", filepath);
 
 		stbi_image_free(data);
 	}

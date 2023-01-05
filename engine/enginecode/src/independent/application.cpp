@@ -298,8 +298,8 @@ namespace Engine {
 #pragma region TEXTURES
 
 		std::shared_ptr<OpenGLTexture> letterTexture;
-		std::shared_ptr<OpenGLTexture> numberTexture;
 		letterTexture.reset(new OpenGLTexture("assets/textures/letterCube.png", 0));
+		std::shared_ptr<OpenGLTexture> numberTexture;
 		numberTexture.reset(new OpenGLTexture("assets/textures/numberCube.png", 1));
 
 #pragma endregion
@@ -381,29 +381,43 @@ namespace Engine {
 			glUseProgram(FCShader->getRenderID());
 			glBindVertexArray(pyramidVAO->getRenderID());
 
-			//GLuint uniformLocation;
+			GLuint uniformLocation;
 
 			FCShader->uploadMat4("u_model", models[0]);
+			FCShader->uploadMat4("u_view", view);
+			FCShader->uploadMat4("u_projection", projection);
 
 			glDrawElements(GL_TRIANGLES, pyramidVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 
 			glUseProgram(TPShader->getRenderID());
 			glBindVertexArray(cubeVAO->getRenderID());
 
+			//uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_model");
+			//glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(models[1]));
+			TPShader->uploadMat4("u_model", models[1]);
+			TPShader->uploadMat4("u_view", view);
+			TPShader->uploadMat4("u_projection", projection);
+
+			//uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_texData");
+			//glUniform1i(uniformLocation, 0);
+
 			TPShader->uploadMat4("u_model", models[1]);;
 			if (unitManager.getUnit(letterTexture->getRenderID(), slot)) {
 				letterTexture->bindToSlot(slot);
 			}
-			TPShader->uploadInt("u_textData", slot);
+			TPShader->uploadInt("u_texData", slot);
 
 			glDrawElements(GL_TRIANGLES, cubeVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 
 			TPShader->uploadMat4("u_model", models[2]);
 
+			//uniformLocation = glGetUniformLocation(TPShader->getRenderID(), "u_texData");
+			//glUniform1i(uniformLocation, 1);
+			
 			if (unitManager.getUnit(numberTexture->getRenderID(), slot)) {
 				numberTexture->bindToSlot(slot);
 			}
-			TPShader->uploadInt("u_textData", slot);
+			TPShader->uploadInt("u_texData", slot);
 
 			glDrawElements(GL_TRIANGLES, cubeVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 
