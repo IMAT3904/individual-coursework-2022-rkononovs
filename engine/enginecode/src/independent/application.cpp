@@ -345,9 +345,9 @@ namespace Engine {
 		swu3D["u_viewPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[2])));
 
 		Quad quads[3] = {
-			Quad::createCentralHalfExtents({ 200.f, 200.f }, { 200.f, 200.f }),
-			Quad::createCentralHalfExtents({ 100.f, 100.f }, { 350.f, 350.f }),
-			Quad::createCentralHalfExtents({ 400.f, 500.f }, { 75.f, 75.f })
+			Quad::createCentralHalfExtents({ 60.f, 60.f }, { 200.f, 200.f }),
+			Quad::createCentralHalfExtents({ 60.f, 800.f - 60.f }, { 50.f, 50.f }),
+			Quad::createCentralHalfExtents({ 1024.f - 60.f, 60.f }, { 50.f, 30.f })
 		};
 
 		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);

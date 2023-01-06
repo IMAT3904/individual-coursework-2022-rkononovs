@@ -83,7 +83,7 @@ namespace Engine {
 
 		s_data->shader->uploadInt("u_texData", textSlot);
 
-		s_data->model = glm::scale(glm::translate(glm::mat4(1.f), quad.m_scale), quad.m_translate);
+		s_data->model = glm::scale(glm::translate(glm::mat4(1.f), quad.m_translate), quad.m_scale);
 
 		s_data->shader->uploadFloat4("u_tint", tint);
 		s_data->shader->uploadMat4("u_model", s_data->model);
