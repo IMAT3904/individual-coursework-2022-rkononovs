@@ -21,7 +21,6 @@
 
 namespace Engine {
 	// Set static vars
-	// uint32_t OpenGLTexture::m_textureAmount = 0;
 	Application* Application::s_instance = nullptr;
 
 	Application::Application()
@@ -293,9 +292,6 @@ namespace Engine {
 #pragma endregion 
 
 #pragma region TEXTURES
-		unsigned char whitePx[4] = { 255, 255, 255, 255 };
-		std::shared_ptr<OpenGLTexture> plainWhiteTexture;
-		plainWhiteTexture.reset(new OpenGLTexture(1, 1, 4, whitePx, 0));
 		std::shared_ptr<OpenGLTexture> letterTexture;
 		letterTexture.reset(new OpenGLTexture("assets/textures/letterCube.png", 1));
 		std::shared_ptr<OpenGLTexture> numberTexture;
@@ -321,44 +317,9 @@ namespace Engine {
 			glm::vec3(0.f, 1.f, 0.f)
 		);
 		glm::mat4 projection = glm::perspective(glm::radians(45.f), 1024.f / 800.f, 0.1f, 100.f);
-
-		// Camera UBO
-		uint32_t blockNumber = 0;
-
-		UniformBufferLayout camLayout = { { "u_projection", ShaderDataType::Mat4}, {"u_view", ShaderDataType::Mat4} };
-		/*
-		std::shared_ptr<OpenGLUniformBuffer> cameraUBO;
-		cameraUBO.reset(new OpenGLUniformBuffer(camLayout));
-
-		cameraUBO->attachShaderBlock(TPShader, "b_camera");
-
-		cameraUBO->uploadData("u_projection", glm::value_ptr(projection));
-		cameraUBO->uploadData("u_view", glm::value_ptr(view));
-		*/
-		blockNumber++;
 		
 		glm::vec4 tint(0.3f, 0.9f, 4.f, 1.f);
 
-		/*uint32_t lightsUBO;
-		uint32_t lightsDataSiz = sizeof(glm::vec4) * 4;
-
-		glGenBuffers(1, &lightsUBO);
-		glBindBuffer(GL_UNIFORM_BUFFER, lightsUBO);
-		glBufferData(GL_UNIFORM_BUFFER, lightsDataSiz, nullptr, GL_DYNAMIC_DRAW);
-		glBindBufferRange(GL_UNIFORM_BUFFER, blockNumber, lightsUBO, 0, lightsDataSiz);
-
-		uint32_t blockIndex = glGetUniformBlockIndex(TPShader->getRenderID(), "b_lights");
-		glUniformBlockBinding(TPShader->getRenderID(), blockIndex, blockNumber);
-
-		glm::vec3 lightColour = glm::vec3(1.f, 1.f, 1.f);
-		glm::vec3 lightPos = glm::vec3(1.f, 4.f, 6.f);
-		glm::vec3 viewPos = glm::vec3(0.f, 0.f, 0.f);
-
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec3), glm::value_ptr(lightPos));
-		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4), sizeof(glm::vec3), glm::value_ptr(viewPos));
-		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 2, sizeof(glm::vec3), glm::value_ptr(lightColour));
-		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 3, sizeof(glm::vec4), glm::value_ptr(tint));
-		*/
 		glm::mat4 models[3];
 		models[0] = glm::translate(glm::mat4(1.0f), glm::vec3(-2.f, 0.f, -6.f));
 		models[1] = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.f, -6.f));
@@ -386,11 +347,10 @@ namespace Engine {
 		int seconds = 0;
 
 		LoggerSys::info("Application is starting.");
-		LoggerSys::file("Application is starting. One");
-		LoggerSys::file("Application is starting. Two");
 
 		Renderer3D::init();
 		Renderer3D::attachShader(TPShader);
+
 		while (m_running)
 		{
 			timestep = m_timer->getElapsedTime();
@@ -411,43 +371,6 @@ namespace Engine {
 			Renderer3D::submit(cubeVAO, numberCubeMat, models[2]);
 			Renderer3D::end();
 
-			/*glUseProgram(TPShader->getRenderID());
-			glBindVertexArray(pyramidVAO->getRenderID());
-
-			TPShader->uploadMat4("u_model", models[0]);
-			TPShader->uploadFloat4("u_tint", { 0.3f, 0.9f, 4.f, 1.f });
-
-			if (unitManager.getUnit(plainWhiteTexture->getRenderID(), slot)) {
-				plainWhiteTexture->bindToSlot(slot);
-			}
-
-			TPShader->uploadInt("u_texData", slot);
-
-			glDrawElements(GL_TRIANGLES, pyramidVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
-			
-			glUseProgram(TPShader->getRenderID());
-			glBindVertexArray(cubeVAO->getRenderID());
-
-			TPShader->uploadMat4("u_model", models[1]);
-			TPShader->uploadFloat4("u_tint", { 1.f, 1.f, 1.f, 1.f });
-
-			if (unitManager.getUnit(letterTexture->getRenderID(), slot)) {
-				letterTexture->bindToSlot(slot);
-			}
-
-			TPShader->uploadInt("u_texData", slot);
-
-			glDrawElements(GL_TRIANGLES, cubeVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
-
-			TPShader->uploadMat4("u_model", models[2]);
-
-			if (unitManager.getUnit(numberTexture->getRenderID(), slot)) {
-				numberTexture->bindToSlot(slot);
-			}
-			TPShader->uploadInt("u_texData", slot);
-
-			glDrawElements(GL_TRIANGLES, cubeVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
-			*/
 			m_window->onUpdate(timestep);
 		};
 	}
