@@ -37,6 +37,9 @@ namespace Engine {
 		static void submit(const Quad& quad, const glm::vec4& tint); //!< Render a tinted quad
 		static void submit(const Quad& quad, const std::shared_ptr<OpenGLTexture>& texture); //!< Render a textured quad
 		static void submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<OpenGLTexture>& texture); //!< Render a textured and tinted quad
+		static void submit(const Quad& quad, const glm::vec4& tint, float angle, bool degrees = false); //!< Render a textured and tinted quad
+		static void submit(const Quad& quad, const std::shared_ptr<OpenGLTexture>& texture, float angle, bool degrees = false); //!< Render a textured and tinted quad
+		static void submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<OpenGLTexture>& texture, float angle, bool degrees = false); //!< Render a textured and tinted quad
 		static void end(); //!< End the current 2D scene
 	};
 }

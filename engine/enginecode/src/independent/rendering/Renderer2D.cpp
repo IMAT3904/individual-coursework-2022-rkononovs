@@ -7,7 +7,6 @@
 
 namespace Engine {
 	std::shared_ptr<Renderer2D::InternalData> Renderer2D::s_data = nullptr;
-	//TextureUnitManager RendererCommon::s_textureUnitManager = TextureUnitManager(32);
 
 	void Renderer2D::init(){
 		s_data.reset(new InternalData);
@@ -48,16 +47,13 @@ namespace Engine {
 	void Renderer2D::begin(const SceneWideUniforms& sceneWideUniforms){
 		// Bind the geometry
 		glBindVertexArray(s_data->VAO->getRenderID());
+
 		// Bind the shader
 		glUseProgram(s_data->shader->getRenderID());
 		
-		//glBindBuffer(GL_UNIFORM_BUFFER, s_data->quadUBO->getRenderID());
+		
 		s_data->quadUBO->uploadData("u_view", sceneWideUniforms.at("u_view").second);
 		s_data->quadUBO->uploadData("u_projection", sceneWideUniforms.at("u_projection").second);
-
-		//Apply sceneWideUniforms
-
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s_data->VAO->getIndexBuffer()->getRenderID());
 	}
 
 	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint){
@@ -84,6 +80,39 @@ namespace Engine {
 		s_data->shader->uploadInt("u_texData", textSlot);
 
 		s_data->model = glm::scale(glm::translate(glm::mat4(1.f), quad.m_translate), quad.m_scale);
+
+		s_data->shader->uploadFloat4("u_tint", tint);
+		s_data->shader->uploadMat4("u_model", s_data->model);
+
+		glDrawElements(GL_QUADS, s_data->VAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
+	}
+
+	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, float angle, bool degrees){
+		Renderer2D::submit(quad, tint, s_data->defaultTexture, angle, degrees);
+	}
+
+	void Renderer2D::submit(const Quad& quad, const std::shared_ptr<OpenGLTexture>& texture, float angle, bool degrees){
+		Renderer2D::submit(quad, s_data->defaultTint, texture, angle, degrees);
+	}
+
+	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<OpenGLTexture>& texture, float angle, bool degrees)
+	{
+		if (degrees) angle = glm::radians(angle);
+
+		uint32_t textSlot;
+		const uint32_t& textureID = texture->getRenderID();
+		bool needsBinding = RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
+		if (needsBinding) {
+			if (textSlot == -1) {
+				RendererCommon::s_textureUnitManager.clear();
+				RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
+			}
+			texture->bindToSlot(textSlot);
+		}
+
+		s_data->shader->uploadInt("u_texData", textSlot);
+
+		s_data->model = glm::scale(glm::rotate(glm::translate(glm::mat4(1.f), quad.m_translate), angle, {0.f, 0.f, 1.f }), quad.m_scale);
 
 		s_data->shader->uploadFloat4("u_tint", tint);
 		s_data->shader->uploadMat4("u_model", s_data->model);

@@ -294,9 +294,11 @@ namespace Engine {
 
 #pragma region TEXTURES
 		std::shared_ptr<OpenGLTexture> letterTexture;
-		letterTexture.reset(new OpenGLTexture("assets/textures/letterCube.png", 1));
+		letterTexture.reset(new OpenGLTexture("./assets/textures/letterCube.png", 1));
 		std::shared_ptr<OpenGLTexture> numberTexture;
-		numberTexture.reset(new OpenGLTexture("assets/textures/numberCube.png", 2));
+		numberTexture.reset(new OpenGLTexture("./assets/textures/numberCube.png", 2));
+		std::shared_ptr<OpenGLTexture> moonTexture;
+		moonTexture.reset(new OpenGLTexture("./assets/textures/moon.png", 3));
 
 #pragma endregion
 
@@ -344,10 +346,12 @@ namespace Engine {
 		swu3D["u_lightPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[1])));
 		swu3D["u_viewPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[2])));
 
-		Quad quads[3] = {
-			Quad::createCentralHalfExtents({ 60.f, 60.f }, { 200.f, 200.f }),
+		Quad quads[6] = {
+			Quad::createCentralHalfExtents({ 60.f, 60.f }, { 50.f, 50.f }),
+			Quad::createCentralHalfExtents({ 1024.f - 60.f, 60.f }, { 30.f, 30.f }),
+			Quad::createCentralHalfExtents({ 1024.f - 60.f, 800.f - 60.f }, { 50.f, 50.f }),
 			Quad::createCentralHalfExtents({ 60.f, 800.f - 60.f }, { 50.f, 50.f }),
-			Quad::createCentralHalfExtents({ 1024.f - 60.f, 60.f }, { 50.f, 30.f })
+			Quad::createCentralHalfExtents({ 512.f, 400.f }, { 50.f, 50.f }),
 		};
 
 		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
@@ -392,13 +396,16 @@ namespace Engine {
 			
 			
 			glDisable(GL_DEPTH_TEST);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			Renderer2D::begin(swu2D);
-			Renderer2D::submit(quads[0], {0.f, 0.f, 1.f, 1.f});
-			Renderer2D::submit(quads[1],letterTexture);
-			Renderer2D::submit(quads[2], {0.f, 1.f, 1.f, 1.f}, numberTexture);
+			Renderer2D::submit(quads[0], {0.f, 1.f, 1.f, 1.f});
+			Renderer2D::submit(quads[1], {0.f, 1.f, 1.f, 1.f}, 45.f, true);
+			Renderer2D::submit(quads[2], moonTexture);
+			Renderer2D::submit(quads[3], {1.f, 1.f, 0.f, 1.f}, moonTexture);
+			Renderer2D::submit(quads[4], {0.f, 1.f, 1.f, 0.5f}, moonTexture);
 			Renderer2D::end();
-
 			
 			m_window->onUpdate(timestep);
 		};
