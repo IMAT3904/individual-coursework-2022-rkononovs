@@ -7,6 +7,7 @@
 
 namespace Engine {
 	std::shared_ptr<Renderer2D::InternalData> Renderer2D::s_data = nullptr;
+	//TextureUnitManager RendererCommon::s_textureUnitManager = TextureUnitManager(32);
 
 	void Renderer2D::init(){
 		s_data.reset(new InternalData);
@@ -28,51 +29,62 @@ namespace Engine {
 
 		uint32_t indices[4] = { 0,1,2,3 };
 
+		UniformBufferLayout quadLayout = { { "u_projection", ShaderDataType::Mat4}, {"u_view", ShaderDataType::Mat4} };
+		s_data->quadUBO.reset(new OpenGLUniformBuffer(quadLayout));
+
 		std::shared_ptr<OpenGLVertexBuffer> VBO;
 		std::shared_ptr<OpenGLIndexBuffer> IBO;
+
 		s_data->VAO.reset(new OpenGLVertexArray());
 		VBO.reset(new OpenGLVertexBuffer(vertices, sizeof(vertices), VertexBufferLayout({ ShaderDataType::Float2, ShaderDataType::Float2 })));
 		IBO.reset(new OpenGLIndexBuffer(indices, 4));
+
 		s_data->VAO->addVertexBuffer(VBO);
 		s_data->VAO->setIndexBuffer(IBO);
+
+		s_data->quadUBO->attachShaderBlock(s_data->shader, "b_cameraQuad");
 	}
 
 	void Renderer2D::begin(const SceneWideUniforms& sceneWideUniforms){
+		// Bind the geometry
+		glBindVertexArray(s_data->VAO->getRenderID());
 		// Bind the shader
 		glUseProgram(s_data->shader->getRenderID());
+		
+		//glBindBuffer(GL_UNIFORM_BUFFER, s_data->quadUBO->getRenderID());
+		s_data->quadUBO->uploadData("u_view", sceneWideUniforms.at("u_view").second);
+		s_data->quadUBO->uploadData("u_projection", sceneWideUniforms.at("u_projection").second);
 
 		//Apply sceneWideUniforms
-		for (auto& dataPair : sceneWideUniforms) {
-			const char* nameOfUniform = dataPair.first;
-			ShaderDataType sdt = dataPair.second.first;
-			void* addressOfValue = dataPair.second.second;
 
-			switch (sdt) {
-			case ShaderDataType::Int:
-				s_data->shader->uploadInt(nameOfUniform, *(int*)addressOfValue);
-				break;
-			case ShaderDataType::Float3:
-				s_data->shader->uploadFloat3(nameOfUniform, *(glm::vec3*)addressOfValue);
-				break;
-			case ShaderDataType::Float4:
-				s_data->shader->uploadFloat3(nameOfUniform, *(glm::vec4*)addressOfValue);
-				break;
-			case ShaderDataType::Mat4:
-				s_data->shader->uploadMat4(nameOfUniform, *(glm::mat4*)addressOfValue);
-				break;
-			}
-
-			// Bind the geometry
-			glBindVertexArray(s_data->VAO->getRenderID());
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s_data->VAO->getIndexBuffer()->getRenderID());
-		}
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s_data->VAO->getIndexBuffer()->getRenderID());
 	}
 
 	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint){
-		glBindTexture(GL_TEXTURE_2D, s_data->defaultTexture->getRenderID());
+		Renderer2D::submit(quad, tint, s_data->defaultTexture);
+	}
+
+	void Renderer2D::submit(const Quad& quad, const std::shared_ptr<OpenGLTexture>& texture){
+		Renderer2D::submit(quad, s_data->defaultTint, texture);
+	}
+
+	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<OpenGLTexture>& texture){
+
+		uint32_t textSlot;
+		const uint32_t& textureID = texture->getRenderID();
+		bool needsBinding = RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
+		if (needsBinding) {
+			if (textSlot == -1) {
+				RendererCommon::s_textureUnitManager.clear();
+				RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
+			}
+			texture->bindToSlot(textSlot);
+		}
+
+		s_data->shader->uploadInt("u_texData", textSlot);
+
 		s_data->model = glm::scale(glm::translate(glm::mat4(1.f), quad.m_scale), quad.m_translate);
 
-		s_data->shader->uploadInt("u_texData", 0);
 		s_data->shader->uploadFloat4("u_tint", tint);
 		s_data->shader->uploadMat4("u_model", s_data->model);
 
@@ -86,7 +98,7 @@ namespace Engine {
 		Quad result;
 
 		result.m_translate = glm::vec3(centre, 0.f);
-		result.m_scale = glm::vec3(halfExtents * 2.f, 1.f);
+		result.m_scale = glm::vec3(halfExtents * 2.0f, 1.0f);
 
 		return result;
 	}

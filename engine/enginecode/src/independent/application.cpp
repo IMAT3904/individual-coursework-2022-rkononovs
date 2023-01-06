@@ -47,7 +47,7 @@ namespace Engine {
 #endif
 		m_windowsSystem->start();
 
-		WindowProperties props("My Game Engine", 1044, 800);
+		WindowProperties props("My Game Engine", 1024, 800);
 		m_window.reset(Window::create(props));
 
 		m_window->getEventHandler().setOnCloseCallback(std::bind(&Application::onClose, this, std::placeholders::_1));
@@ -329,6 +329,11 @@ namespace Engine {
 		glm::mat4 view2D = glm::mat4(1.f);
 		glm::mat4 projection2D = glm::ortho(0.f, static_cast<float>(m_window->getWidth()), static_cast<float>(m_window->getHeight()), 0.f);
 
+
+		SceneWideUniforms swu2D;
+		swu2D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(view2D)));
+		swu2D["u_projection"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(projection2D)));
+
 		SceneWideUniforms swu3D;
 
 		glm::vec3 lightData[3] = { {1.f, 1.f, 1.f}, {-2.f, 4.f, 6.f}, {0.f, 0.f, 0.f} };
@@ -338,12 +343,12 @@ namespace Engine {
 		swu3D["u_lightColour"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[0])));
 		swu3D["u_lightPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[1])));
 		swu3D["u_viewPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[2])));
-		
-		SceneWideUniforms swu2D;
-		swu2D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(view2D)));
-		swu2D["u_projection"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(projection2D)));
 
-		Quad q1 = Quad::createCentralHalfExtents({ 400.f, 200.f }, { 100.f, 50.f });
+		Quad quads[3] = {
+			Quad::createCentralHalfExtents({ 200.f, 200.f }, { 200.f, 200.f }),
+			Quad::createCentralHalfExtents({ 100.f, 100.f }, { 350.f, 350.f }),
+			Quad::createCentralHalfExtents({ 400.f, 500.f }, { 75.f, 75.f })
+		};
 
 		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
 
@@ -358,6 +363,7 @@ namespace Engine {
 
 		Renderer3D::init();
 		Renderer3D::attachShader(TPShader);
+
 		Renderer2D::init();
 		while (m_running)
 		{
@@ -369,13 +375,13 @@ namespace Engine {
 			//if (InputPoller::isMouseButtonPressed(NG_MOUSE_BUTTON_1)) LoggerSys::error("Left mouse button has been pressed");
 
 			// Do frame stuff
-			for (auto& model : models) { model = glm::rotate(model, timestep, glm::vec3(0.f, 1.0, 0.f)); }
+			for (auto& model : models) { model = glm::rotate(model, timestep * 100, glm::vec3(0.f, 1.0, 0.f)); }
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 			
 			glEnable(GL_DEPTH_TEST);
-
+			
 			Renderer3D::begin(swu3D);
 
 			Renderer3D::submit(pyramidVAO, pyramidMat, models[0]);
@@ -384,14 +390,16 @@ namespace Engine {
 
 			Renderer3D::end();
 			
-
+			
 			glDisable(GL_DEPTH_TEST);
 
 			Renderer2D::begin(swu2D);
-			Renderer2D::submit(q1, { 0.f, 0.f, 1.f, 1.f });
+			Renderer2D::submit(quads[0], {0.f, 0.f, 1.f, 1.f});
+			Renderer2D::submit(quads[1],letterTexture);
+			Renderer2D::submit(quads[2], {0.f, 1.f, 1.f, 1.f}, numberTexture);
 			Renderer2D::end();
 
-
+			
 			m_window->onUpdate(timestep);
 		};
 	}

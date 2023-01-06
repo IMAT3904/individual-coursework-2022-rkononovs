@@ -9,8 +9,7 @@
 namespace Engine{
 
 	std::shared_ptr<Renderer3D::InternalData> Renderer3D::s_data = nullptr;
-	TextureUnitManager Renderer3D::m_textureUnitManager = TextureUnitManager(32);
-	uint32_t textSlot;
+	TextureUnitManager RendererCommon::s_textureUnitManager = TextureUnitManager(32);
 
 	void Renderer3D::init(){
 		s_data.reset(new InternalData);
@@ -43,29 +42,6 @@ namespace Engine{
 		glUseProgram(material->getShader()->getRenderID());
 		glBindVertexArray(geometry->getRenderID());
 
-		//Apply sceneWideUniforms
-		for (auto& dataPair : s_data->sceneWideUniforms) {
-			const char* nameOfUniform = dataPair.first;
-			ShaderDataType& sdt = dataPair.second.first;
-			void* addressOfValue = dataPair.second.second;
-
-			switch (sdt) {
-			case ShaderDataType::Int:
-				material->getShader()->uploadInt(nameOfUniform, *(int*)addressOfValue);
-				break;
-			case ShaderDataType::Float3:
-				material->getShader()->uploadFloat3(nameOfUniform, *(glm::vec3*)addressOfValue);
-				break;
-			case ShaderDataType::Float4:
-				material->getShader()->uploadFloat3(nameOfUniform , *(glm::vec4*)addressOfValue);
-				break;
-			case ShaderDataType::Mat4:
-				material->getShader()->uploadMat4(nameOfUniform, *(glm::mat4*)addressOfValue);
-				break;
-			}
-
-		}
-
 		//Apply material uniforms ( Per draw uniforms )
 		material->getShader()->uploadMat4("u_model", model);
 
@@ -77,7 +53,15 @@ namespace Engine{
 			texture = s_data->defaultTexture;
 		}
 
-		if (m_textureUnitManager.getUnit(texture->getRenderID(), textSlot)) {
+		uint32_t textSlot;
+		const uint32_t& textureID = texture->getRenderID();
+		bool needsBinding = RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
+
+		if (needsBinding) {
+			if (textSlot == -1) {
+				RendererCommon::s_textureUnitManager.clear();
+				RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
+			}
 			texture->bindToSlot(textSlot);
 		}
 
@@ -86,10 +70,6 @@ namespace Engine{
 		if (material->isFlagSet(Material::flag_tint)) material->getShader()->uploadFloat4("u_tint", material->getTint());
 		else material->getShader()->uploadFloat4("u_tint", s_data->defaultTint);
 
-		//Bind the geometry (VAO and IBO)
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->getIndexBuffer()->getRenderID());
-
-		//Submit the draw call
 		glDrawElements(GL_TRIANGLES, geometry->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 	}
 	void Renderer3D::end(){

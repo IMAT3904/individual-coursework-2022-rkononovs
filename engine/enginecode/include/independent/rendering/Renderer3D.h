@@ -58,7 +58,7 @@ namespace Engine {
 			glm::vec3 lightPos = glm::vec3(1.f, 4.f, 6.f);
 			glm::vec3 viewPos = glm::vec3(0.f, 0.f, 0.f);
 		};
-		static TextureUnitManager m_textureUnitManager;
+		//static TextureUnitManager m_textureUnitManager;
 		static std::shared_ptr<InternalData> s_data; //!< Data internal to the renderer
 	public:
 		static void init(); //!< Init the renderer

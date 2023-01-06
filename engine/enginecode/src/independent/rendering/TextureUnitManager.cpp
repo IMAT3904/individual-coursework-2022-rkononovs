@@ -4,36 +4,41 @@
 #include "rendering/TextureUnitManager.h"
 
 namespace Engine {
-	TextureUnitManager::TextureUnitManager(){
+	TextureUnitManager::TextureUnitManager(size_t capacity){
+		// Resize the texture ID's
+		m_textureIds.resize(capacity);
+
+		// Fill with the max value
+		std::fill(m_textureIds.begin(), m_textureIds.end(), std::numeric_limits<uint32_t>::max());
+
+		// Create to space in map
+		m_textureUnits.reserve(capacity * 2);
 	}
 	void TextureUnitManager::clear(){
-		m_head = 0;
-		m_tail = 0;
-		m_full = false;
-		std::fill(m_buffer.begin(), m_buffer.end(), 0xFFFFFFFF);
+		std::fill(m_textureIds.begin(), m_textureIds.end(), std::numeric_limits<uint32_t>::max());
+		m_textureUnits.clear();
+		m_nextUnit = 0;
 	}
-	bool TextureUnitManager::getUnit(uint32_t textureID, uint32_t& textureUnit)
-	{
-		// Is the texture already bound
-		for (int i = m_tail; i < m_head; i++) {
-			if (m_buffer.at(i) == textureID) {
-				textureUnit = i;
-				return false;
-			}
+	bool TextureUnitManager::getUnit(uint32_t textureID, uint32_t& textureUnit){
+		auto unitItr = m_textureUnits.find(textureID);
+		if (unitItr != m_textureUnits.end()) {
+			textureUnit = unitItr->second;
+			return false;
 		}
-		// Texture unit is not bound
 
-		// Is there space in the buffer
-		if (m_full) clear();
+		if (full()) {
+			textureUnit = -1;
+			return true;
+		}
+		else {
+			textureUnit = m_nextUnit;
+			
+			m_textureIds[m_nextUnit] = textureID;
+			m_textureUnits[textureID] = m_nextUnit;
 
-		// Put textureID in the buffer
-		m_buffer.at(m_head) = textureID;
-		textureUnit = m_head;
-		
-		// Checking if over capacity
-		m_head = (++m_head) % m_capacity;
-		if (m_head == m_tail) m_full = true;
+			m_nextUnit++;
 
-		return true;
+			return true;
+		}
 	}
 }

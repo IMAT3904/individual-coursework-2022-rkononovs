@@ -23,15 +23,20 @@ namespace Engine {
 			std::shared_ptr<OpenGLTexture> defaultTexture;
 			std::shared_ptr<OpenGLShader> shader;
 			std::shared_ptr<OpenGLVertexArray> VAO;
+			std::shared_ptr<OpenGLUniformBuffer> quadUBO; 
 			glm::vec4 defaultTint;
 			glm::mat4 model;
 		};
 
 		static std::shared_ptr<InternalData> s_data;
+		//static TextureUnitManager m_textureUnitManager;
+
 	public:
 		static void init(); //!< Init the renderer
 		static void begin(const SceneWideUniforms& sceneWideUniforms); //!< Begin a new 2D scene
-		static void submit(const Quad& quad, const glm::vec4& tint); //!< Submit a piece of geometry to be rendered
+		static void submit(const Quad& quad, const glm::vec4& tint); //!< Render a tinted quad
+		static void submit(const Quad& quad, const std::shared_ptr<OpenGLTexture>& texture); //!< Render a textured quad
+		static void submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<OpenGLTexture>& texture); //!< Render a textured and tinted quad
 		static void end(); //!< End the current 2D scene
 	};
 }
