@@ -18,6 +18,7 @@
 #include "platform/OpenGL/OpenGLUniformBuffer.h"
 #include "rendering/TextureUnitManager.h"
 #include "rendering/Renderer3D.h"
+#include "rendering/Renderer2D.h"
 
 namespace Engine {
 	// Set static vars
@@ -325,7 +326,9 @@ namespace Engine {
 		models[1] = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.f, -6.f));
 		models[2] = glm::translate(glm::mat4(1.0f), glm::vec3(2.f, 0.f, -6.f));
 	
-		
+		glm::mat4 view2D = glm::mat4(1.f);
+		glm::mat4 projection2D = glm::ortho(0.f, static_cast<float>(m_window->getWidth()), static_cast<float>(m_window->getHeight()), 0.f);
+
 		SceneWideUniforms swu3D;
 
 		glm::vec3 lightData[3] = { {1.f, 1.f, 1.f}, {-2.f, 4.f, 6.f}, {0.f, 0.f, 0.f} };
@@ -336,7 +339,12 @@ namespace Engine {
 		swu3D["u_lightPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[1])));
 		swu3D["u_viewPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[2])));
 		
-		glEnable(GL_DEPTH_TEST);
+		SceneWideUniforms swu2D;
+		swu2D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(view2D)));
+		swu2D["u_projection"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(projection2D)));
+
+		Quad q1 = Quad::createCentralHalfExtents({ 400.f, 200.f }, { 100.f, 50.f });
+
 		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
 
 		TextureUnitManager unitManager(32);
@@ -350,7 +358,7 @@ namespace Engine {
 
 		Renderer3D::init();
 		Renderer3D::attachShader(TPShader);
-
+		Renderer2D::init();
 		while (m_running)
 		{
 			timestep = m_timer->getElapsedTime();
@@ -365,11 +373,24 @@ namespace Engine {
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
+			
+			glEnable(GL_DEPTH_TEST);
+
 			Renderer3D::begin(swu3D);
+
 			Renderer3D::submit(pyramidVAO, pyramidMat, models[0]);
 			Renderer3D::submit(cubeVAO, letterCubeMat, models[1]);
 			Renderer3D::submit(cubeVAO, numberCubeMat, models[2]);
+
 			Renderer3D::end();
+			
+
+			glDisable(GL_DEPTH_TEST);
+
+			Renderer2D::begin(swu2D);
+			Renderer2D::submit(q1, { 0.f, 0.f, 1.f, 1.f });
+			Renderer2D::end();
+
 
 			m_window->onUpdate(timestep);
 		};

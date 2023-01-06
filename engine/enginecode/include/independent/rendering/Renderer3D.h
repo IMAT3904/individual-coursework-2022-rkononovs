@@ -1,18 +1,8 @@
-/** Renderer3D.h */
+/** \file Renderer3D.h */
 #pragma once
-#include <glm/glm.hpp>
-#include <unordered_map>
-#include <memory>
-
-#include "platform/OpenGL/OpenGLTexture.h"
-#include "platform/OpenGL/OpenGLShader.h"
-#include "platform/OpenGL/OpenGLVertexArray.h"
-#include "platform/OpenGL/OpenGLUniformBuffer.h"
-#include "rendering/shaderDataType.h"
-#include "rendering/TextureUnitManager.h"
+#include "rendering/RendererCommon.h"
 
 namespace Engine {
-	using SceneWideUniforms = std::unordered_map<const char*, std::pair<ShaderDataType, void*>>;
 
 	/** \class Material/
 	*   \brief Gold a shader and the uniform data associated with that shader
@@ -73,7 +63,7 @@ namespace Engine {
 	public:
 		static void init(); //!< Init the renderer
 		static void begin(const SceneWideUniforms& sceneWideUniforms); //!< Begin a new 3D scene
-		static void submit(const std::shared_ptr<OpenGLVertexArray> geometry, const std::shared_ptr<Material>& material, const glm::mat4& model); //!< Submit a piece of geomettry to be rendered
+		static void submit(const std::shared_ptr<OpenGLVertexArray> geometry, const std::shared_ptr<Material>& material, const glm::mat4& model); //!< Submit a piece of geometry to be rendered
 		static void end(); //!< End the current 3D scene
 		static void attachShader(std::shared_ptr<OpenGLShader>& shader); //!< Attach shader ot the UBO's
 	};

@@ -51,6 +51,7 @@ namespace Engine {
 		glActiveTexture(GL_TEXTURE0 + slot);
 		LoggerSys::info("Current slot is: {0}", slot);
 		glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
+		LoggerSys::info("Binding texture {0} to slot {1}", m_OpenGL_ID, slot);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

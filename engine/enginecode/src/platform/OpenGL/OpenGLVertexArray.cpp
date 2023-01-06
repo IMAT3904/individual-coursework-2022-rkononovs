@@ -28,6 +28,8 @@ namespace Engine {
 	}
 	void OpenGLVertexArray::addVertexBuffer(const std::shared_ptr<OpenGLVertexBuffer>& vertexBuffer)
 	{
+		m_vertexBuffer.push_back(vertexBuffer);
+
 		glBindVertexArray(m_OpenGL_ID);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer->getRenderID());
 
