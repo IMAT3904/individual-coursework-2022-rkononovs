@@ -4,6 +4,8 @@
 #include "rendering/TextureUnitManager.h"
 
 namespace Engine {
+	TextureUnitManager::TextureUnitManager(){
+	}
 	void TextureUnitManager::clear(){
 		m_head = 0;
 		m_tail = 0;

@@ -17,6 +17,7 @@
 #include "platform/OpenGL/OpenGLTexture.h"
 #include "platform/OpenGL/OpenGLUniformBuffer.h"
 #include "rendering/TextureUnitManager.h"
+#include "rendering/Renderer3D.h"
 
 namespace Engine {
 	// Set static vars
@@ -302,6 +303,18 @@ namespace Engine {
 
 #pragma endregion
 
+#pragma region MATERIALS
+
+		std::shared_ptr<Material> pyramidMat;
+		std::shared_ptr<Material> letterCubeMat;
+		std::shared_ptr<Material> numberCubeMat;
+
+		pyramidMat.reset(new Material(TPShader,{ 0.3f, 0.9f, 4.f, 1.f }));
+		letterCubeMat.reset(new Material(TPShader, letterTexture));
+		numberCubeMat.reset(new Material(TPShader, numberTexture));
+
+#pragma endregion
+
 		glm::mat4 view = glm::lookAt(
 			glm::vec3(0.f, 0.f, 0.f),
 			glm::vec3(0.f, 0.f, -1.f),
@@ -313,7 +326,7 @@ namespace Engine {
 		uint32_t blockNumber = 0;
 
 		UniformBufferLayout camLayout = { { "u_projection", ShaderDataType::Mat4}, {"u_view", ShaderDataType::Mat4} };
-
+		/*
 		std::shared_ptr<OpenGLUniformBuffer> cameraUBO;
 		cameraUBO.reset(new OpenGLUniformBuffer(camLayout));
 
@@ -321,15 +334,12 @@ namespace Engine {
 
 		cameraUBO->uploadData("u_projection", glm::value_ptr(projection));
 		cameraUBO->uploadData("u_view", glm::value_ptr(view));
-
+		*/
 		blockNumber++;
+		
+		glm::vec4 tint(0.3f, 0.9f, 4.f, 1.f);
 
-		glm::vec3 lightColour(1.f, 1.f, 1.f);
-		glm::vec3 lightPos(1.f, 4.f, 6.f);
-		glm::vec3 viewPos(0.f, 0.f, 0.f);
-		//glm::vec4 tint(0.3f, 0.9f, 4.f, 1.f);
-
-		uint32_t lightsUBO;
+		/*uint32_t lightsUBO;
 		uint32_t lightsDataSiz = sizeof(glm::vec4) * 4;
 
 		glGenBuffers(1, &lightsUBO);
@@ -340,16 +350,31 @@ namespace Engine {
 		uint32_t blockIndex = glGetUniformBlockIndex(TPShader->getRenderID(), "b_lights");
 		glUniformBlockBinding(TPShader->getRenderID(), blockIndex, blockNumber);
 
+		glm::vec3 lightColour = glm::vec3(1.f, 1.f, 1.f);
+		glm::vec3 lightPos = glm::vec3(1.f, 4.f, 6.f);
+		glm::vec3 viewPos = glm::vec3(0.f, 0.f, 0.f);
+
 		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec3), glm::value_ptr(lightPos));
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4), sizeof(glm::vec3), glm::value_ptr(viewPos));
 		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 2, sizeof(glm::vec3), glm::value_ptr(lightColour));
-		//glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 3, sizeof(glm::vec4), glm::value_ptr(tint));
-
+		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::vec4) * 3, sizeof(glm::vec4), glm::value_ptr(tint));
+		*/
 		glm::mat4 models[3];
 		models[0] = glm::translate(glm::mat4(1.0f), glm::vec3(-2.f, 0.f, -6.f));
 		models[1] = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.f, -6.f));
 		models[2] = glm::translate(glm::mat4(1.0f), glm::vec3(2.f, 0.f, -6.f));
+	
+		
+		SceneWideUniforms swu3D;
 
+		glm::vec3 lightData[3] = { {1.f, 1.f, 1.f}, {-2.f, 4.f, 6.f}, {0.f, 0.f, 0.f} };
+		
+		swu3D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(view)));
+		swu3D["u_projection"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(projection)));
+		swu3D["u_lightColour"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[0])));
+		swu3D["u_lightPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[1])));
+		swu3D["u_viewPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[2])));
+		
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
 
@@ -363,6 +388,9 @@ namespace Engine {
 		LoggerSys::info("Application is starting.");
 		LoggerSys::file("Application is starting. One");
 		LoggerSys::file("Application is starting. Two");
+
+		Renderer3D::init();
+		Renderer3D::attachShader(TPShader);
 		while (m_running)
 		{
 			timestep = m_timer->getElapsedTime();
@@ -376,8 +404,14 @@ namespace Engine {
 			for (auto& model : models) { model = glm::rotate(model, timestep, glm::vec3(0.f, 1.0, 0.f)); }
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			
+			Renderer3D::begin(swu3D);
+			Renderer3D::submit(pyramidVAO, pyramidMat, models[0]);
+			Renderer3D::submit(cubeVAO, letterCubeMat, models[1]);
+			Renderer3D::submit(cubeVAO, numberCubeMat, models[2]);
+			Renderer3D::end();
 
-			glUseProgram(TPShader->getRenderID());
+			/*glUseProgram(TPShader->getRenderID());
 			glBindVertexArray(pyramidVAO->getRenderID());
 
 			TPShader->uploadMat4("u_model", models[0]);
@@ -388,11 +422,9 @@ namespace Engine {
 			}
 
 			TPShader->uploadInt("u_texData", slot);
-			TPShader->uploadMat4("u_view", view);
-			TPShader->uploadMat4("u_projection", projection);
 
 			glDrawElements(GL_TRIANGLES, pyramidVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
-
+			
 			glUseProgram(TPShader->getRenderID());
 			glBindVertexArray(cubeVAO->getRenderID());
 
@@ -415,7 +447,7 @@ namespace Engine {
 			TPShader->uploadInt("u_texData", slot);
 
 			glDrawElements(GL_TRIANGLES, cubeVAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
-
+			*/
 			m_window->onUpdate(timestep);
 		};
 	}

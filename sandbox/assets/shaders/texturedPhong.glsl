@@ -41,7 +41,7 @@ layout (std140) uniform b_lights
 	vec3 u_viewPos; 
 	vec3 u_lightColour;
 };
-	uniform vec4 u_tint;
+uniform vec4 u_tint;
 
 uniform sampler2D u_texData;
 void main()
