@@ -346,7 +346,7 @@ namespace Engine {
 		swu3D["u_lightPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[1])));
 		swu3D["u_viewPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[2])));
 
-		Quad quads[6] = {
+		Quad quads[] = {
 			Quad::createCentralHalfExtents({ 60.f, 60.f }, { 50.f, 50.f }),
 			Quad::createCentralHalfExtents({ 1024.f - 60.f, 60.f }, { 30.f, 30.f }),
 			Quad::createCentralHalfExtents({ 1024.f - 60.f, 800.f - 60.f }, { 50.f, 50.f }),
@@ -369,6 +369,7 @@ namespace Engine {
 		Renderer3D::attachShader(TPShader);
 
 		Renderer2D::init();
+		float advance;
 		while (m_running)
 		{
 			timestep = m_timer->getElapsedTime();
@@ -379,7 +380,7 @@ namespace Engine {
 			//if (InputPoller::isMouseButtonPressed(NG_MOUSE_BUTTON_1)) LoggerSys::error("Left mouse button has been pressed");
 
 			// Do frame stuff
-			for (auto& model : models) { model = glm::rotate(model, timestep * 100, glm::vec3(0.f, 1.0, 0.f)); }
+			for (auto& model : models) { model = glm::rotate(model, timestep, glm::vec3(0.f, 1.0, 0.f)); }
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
@@ -405,6 +406,9 @@ namespace Engine {
 			Renderer2D::submit(quads[2], moonTexture);
 			Renderer2D::submit(quads[3], {1.f, 1.f, 0.f, 1.f}, moonTexture);
 			Renderer2D::submit(quads[4], {0.f, 1.f, 1.f, 0.5f}, moonTexture);
+
+			Renderer2D::submit("Hello World!", { 300.f, 70.f }, { 0.2f, 0.2f, 1.f, 1.f });
+
 			Renderer2D::end();
 			
 			m_window->onUpdate(timestep);

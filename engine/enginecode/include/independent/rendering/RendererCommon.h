@@ -9,6 +9,7 @@
 #include "platform/OpenGL/OpenGLUniformBuffer.h"
 #include "rendering/TextureUnitManager.h"
 #include "rendering/shaderDataType.h"
+#include "systems/loggerSys.h"
 
 namespace Engine {
 	using SceneWideUniforms = std::unordered_map<const char*, std::pair<ShaderDataType, void*>>;

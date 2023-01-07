@@ -2,6 +2,8 @@
 #pragma once
 
 #include "rendering/RendererCommon.h"
+#include "ft2build.h"
+#include "freetype/freetype.h"
 
 namespace Engine {
 	class Quad {
@@ -21,16 +23,21 @@ namespace Engine {
 	private:
 		struct InternalData {
 			std::shared_ptr<OpenGLTexture> defaultTexture;
+			std::shared_ptr<OpenGLTexture> fontTexture;
 			std::shared_ptr<OpenGLShader> shader;
 			std::shared_ptr<OpenGLVertexArray> VAO;
-			std::shared_ptr<OpenGLUniformBuffer> quadUBO; 
+			std::shared_ptr<OpenGLUniformBuffer> quadUBO;
+			std::shared_ptr<unsigned char> glyphBuffer;
+			glm::ivec2 glyphBufferDims;
 			glm::vec4 defaultTint;
 			glm::mat4 model;
+			FT_Library ft;
+			FT_Face font;
+			uint32_t glyphBufferSize;
 		};
 
+		static void RtoRGBA(unsigned char* rBuffer, uint32_t width, uint32_t height);
 		static std::shared_ptr<InternalData> s_data;
-		//static TextureUnitManager m_textureUnitManager;
-
 	public:
 		static void init(); //!< Init the renderer
 		static void begin(const SceneWideUniforms& sceneWideUniforms); //!< Begin a new 2D scene
@@ -40,6 +47,9 @@ namespace Engine {
 		static void submit(const Quad& quad, const glm::vec4& tint, float angle, bool degrees = false); //!< Render a textured and tinted quad
 		static void submit(const Quad& quad, const std::shared_ptr<OpenGLTexture>& texture, float angle, bool degrees = false); //!< Render a textured and tinted quad
 		static void submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<OpenGLTexture>& texture, float angle, bool degrees = false); //!< Render a textured and tinted quad
+
+		static void submit(char ch, const glm::vec2& position, float& advance, const glm::vec4& tint); //!< Render a single character with a tint
+		static void submit(const char * text, const glm::vec2& position, const glm::vec4& tint); //!< Render a single character with a tint
 		static void end(); //!< End the current 2D scene
 	};
 }
