@@ -3,7 +3,6 @@
 #include "engine_pch.h"
 #include "stb_image.h"
 #include "platform/OpenGL/OpenGLTexture.h"
-#include "systems/loggerSys.h"
 
 #include <glad/glad.h>
 
@@ -27,7 +26,7 @@ namespace Engine {
 		glDeleteTextures(1, &m_OpenGL_ID);
 	}
 	void OpenGLTexture::edit(uint32_t xOffset, uint32_t yOffset, uint32_t width, uint32_t height, unsigned char* data){
-		glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
+		//glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
 		if (data) {
 			if (m_channels == 3) glTextureSubImage2D(m_OpenGL_ID, 0, xOffset, yOffset, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
 			else if (m_channels == 4) glTextureSubImage2D(m_OpenGL_ID, 0, xOffset, yOffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -51,6 +50,7 @@ namespace Engine {
 		glActiveTexture(GL_TEXTURE0 + slot);
 		//LoggerSys::info("Current slot is: {0}", slot);
 		glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
+		RendererCommon::s_textureUnitManager.clear();
 		//LoggerSys::info("Binding texture {0} to slot {1}", m_OpenGL_ID, slot);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

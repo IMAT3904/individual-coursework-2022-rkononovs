@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cstdint>
+#include "rendering/RendererCommon.h"
 
 namespace Engine {
 	class OpenGLTexture {

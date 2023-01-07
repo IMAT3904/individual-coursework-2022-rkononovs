@@ -29,12 +29,12 @@ namespace Engine{
 		s_data->lightUBO->uploadData("u_lightColour", glm::value_ptr(s_data->lightColour));
 	}
 	void Renderer3D::begin(const SceneWideUniforms& sceneWideUniforms){
-		glBindBuffer(GL_UNIFORM_BUFFER, s_data->cameraUBO->getRenderID());
+		//glBindBuffer(GL_UNIFORM_BUFFER, s_data->cameraUBO->getRenderID());
 		s_data->sceneWideUniforms = sceneWideUniforms;
 		s_data->cameraUBO->uploadData("u_projection", sceneWideUniforms.at("u_projection").second);
 		s_data->cameraUBO->uploadData("u_view", sceneWideUniforms.at("u_view").second);
 
-		glBindBuffer(GL_UNIFORM_BUFFER, s_data->lightUBO->getRenderID());
+		//glBindBuffer(GL_UNIFORM_BUFFER, s_data->lightUBO->getRenderID());
 		s_data->lightUBO->uploadData("u_viewPos", glm::value_ptr(s_data->viewPos));
 	}
 	void Renderer3D::submit(const std::shared_ptr<OpenGLVertexArray> geometry, const std::shared_ptr<Material>& material, const glm::mat4& model){

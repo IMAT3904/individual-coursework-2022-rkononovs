@@ -62,7 +62,7 @@ namespace Engine {
 		if (FT_Set_Pixel_Sizes(s_data->font, 0, charSize)) LoggerSys::error("Error: freetype cannot set font size: {0}", charSize);
 
 		//Init font texture
-		s_data->fontTexture.reset(new OpenGLTexture(s_data->glyphBufferDims.x, s_data->glyphBufferDims.y, 4, nullptr, 0));
+		s_data->fontTexture.reset(new OpenGLTexture(s_data->glyphBufferDims.x, s_data->glyphBufferDims.y, 4, nullptr, 4));
 
 		//Fill the glyph buffer
 		memset(s_data->glyphBuffer.get(), 60, s_data->glyphBufferSize);

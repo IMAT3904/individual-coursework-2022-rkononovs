@@ -294,11 +294,11 @@ namespace Engine {
 
 #pragma region TEXTURES
 		std::shared_ptr<OpenGLTexture> letterTexture;
-		letterTexture.reset(new OpenGLTexture("./assets/textures/letterCube.png", 1));
+		letterTexture.reset(new OpenGLTexture("./assets/textures/letterCube.png", 0));
 		std::shared_ptr<OpenGLTexture> numberTexture;
-		numberTexture.reset(new OpenGLTexture("./assets/textures/numberCube.png", 2));
+		numberTexture.reset(new OpenGLTexture("./assets/textures/numberCube.png", 0));
 		std::shared_ptr<OpenGLTexture> moonTexture;
-		moonTexture.reset(new OpenGLTexture("./assets/textures/moon.png", 3));
+		moonTexture.reset(new OpenGLTexture("./assets/textures/moon.png", 0));
 
 #pragma endregion
 
@@ -401,13 +401,13 @@ namespace Engine {
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			Renderer2D::begin(swu2D);
+
 			Renderer2D::submit(quads[0], {0.f, 1.f, 1.f, 1.f});
 			Renderer2D::submit(quads[1], {0.f, 1.f, 1.f, 1.f}, 45.f, true);
 			Renderer2D::submit(quads[2], moonTexture);
 			Renderer2D::submit(quads[3], {1.f, 1.f, 0.f, 1.f}, moonTexture);
 			Renderer2D::submit(quads[4], {0.f, 1.f, 1.f, 0.5f}, moonTexture);
-
-			Renderer2D::submit("Hello World!", { 300.f, 70.f }, { 0.2f, 0.2f, 1.f, 1.f });
+			Renderer2D::submit("Hello World", { 300.f, 70.f }, { 0.2f, 0.2f, 1.f, 1.f });
 
 			Renderer2D::end();
 			
