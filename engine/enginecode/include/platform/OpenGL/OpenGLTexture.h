@@ -11,7 +11,6 @@ namespace Engine {
 		uint32_t m_width;
 		uint32_t m_height;
 		uint32_t m_channels;
-		// static uint32_t m_textureAmount;
 
 		void init(uint32_t width, uint32_t height, uint32_t channels, unsigned char* data, uint32_t slot);
 	public:

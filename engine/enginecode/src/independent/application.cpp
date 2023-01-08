@@ -19,6 +19,7 @@
 #include "rendering/TextureUnitManager.h"
 #include "rendering/Renderer3D.h"
 #include "rendering/Renderer2D.h"
+#include "cameras/FreeEulerController.h"
 
 namespace Engine {
 	// Set static vars
@@ -313,7 +314,14 @@ namespace Engine {
 		numberCubeMat.reset(new Material(TPShader, numberTexture));
 
 #pragma endregion
-
+#pragma region CAMERAS
+		EulerCameraProps camP;
+		std::shared_ptr<FreeEulerControllerEuler> camera3DEuler;
+		camP.position = glm::vec3(0.f, 0.f, 6.f);
+		camP.aspectRation = (float)m_window->getWidth() / (float)m_window->getHeight();
+		camera3DEuler.reset(new FreeEulerControllerEuler(camP));
+		
+#pragma endregion
 		glm::mat4 view = glm::lookAt(
 			glm::vec3(0.f, 0.f, 0.f),
 			glm::vec3(0.f, 0.f, -1.f),
@@ -331,17 +339,26 @@ namespace Engine {
 		glm::mat4 view2D = glm::mat4(1.f);
 		glm::mat4 projection2D = glm::ortho(0.f, static_cast<float>(m_window->getWidth()), static_cast<float>(m_window->getHeight()), 0.f);
 
+		glm::mat4 cam3Dview = camera3DEuler->getCamera().view;
+		glm::mat4 cam3Dprojection = camera3DEuler->getCamera().projection;
 
 		SceneWideUniforms swu2D;
-		swu2D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(view2D)));
+		swu2D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(view)));
 		swu2D["u_projection"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(projection2D)));
 
 		SceneWideUniforms swu3D;
 
-		glm::vec3 lightData[3] = { {1.f, 1.f, 1.f}, {-2.f, 4.f, 6.f}, {0.f, 0.f, 0.f} };
 		
-		swu3D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(view)));
-		swu3D["u_projection"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(projection)));
+		glm::vec3 lightData[3] = { {1.f, 1.f, 1.f}, {-2.f, 4.f, 6.f}, {0.f, 0.f, 0.f} };
+		if (cam3Dview == view) {
+			LoggerSys::info("YES");
+		}
+		if (cam3Dprojection == projection) {
+			LoggerSys::info("ALSO YES");
+		}
+
+		swu3D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(camera3DEuler->getCamera().view)));
+		swu3D["u_projection"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(camera3DEuler->getCamera().projection)));
 		swu3D["u_lightColour"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[0])));
 		swu3D["u_lightPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[1])));
 		swu3D["u_viewPos"] = std::pair<ShaderDataType, void*>(ShaderDataType::Float3, static_cast<void*>(glm::value_ptr(lightData[2])));
@@ -407,10 +424,14 @@ namespace Engine {
 			Renderer2D::submit(quads[2], moonTexture);
 			Renderer2D::submit(quads[3], {1.f, 1.f, 0.f, 1.f}, moonTexture);
 			Renderer2D::submit(quads[4], {0.f, 1.f, 1.f, 0.5f}, moonTexture);
-			Renderer2D::submit("Hello World", { 300.f, 70.f }, { 0.2f, 0.2f, 1.f, 1.f });
+			Renderer2D::submit("My Game!", { 300.f, 70.f }, { 0.2f, 0.2f, 1.f, 1.f });
 
 			Renderer2D::end();
+
+			camera3DEuler->onUpdate(timestep);
 			
+			glm::mat4 cam3Dvieww = camera3DEuler->getCamera().view;
+
 			m_window->onUpdate(timestep);
 		};
 	}

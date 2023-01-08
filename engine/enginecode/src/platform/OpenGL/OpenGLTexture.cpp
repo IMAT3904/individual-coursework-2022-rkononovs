@@ -26,7 +26,6 @@ namespace Engine {
 		glDeleteTextures(1, &m_OpenGL_ID);
 	}
 	void OpenGLTexture::edit(uint32_t xOffset, uint32_t yOffset, uint32_t width, uint32_t height, unsigned char* data){
-		//glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
 		if (data) {
 			if (m_channels == 3) glTextureSubImage2D(m_OpenGL_ID, 0, xOffset, yOffset, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
 			else if (m_channels == 4) glTextureSubImage2D(m_OpenGL_ID, 0, xOffset, yOffset, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
