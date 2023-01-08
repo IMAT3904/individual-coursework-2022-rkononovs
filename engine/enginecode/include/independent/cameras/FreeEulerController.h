@@ -15,7 +15,7 @@ namespace Engine {
 		float rotationSpeed = 2.0f;
 		float fovY = 45.f;
 		float aspectRation = 16.f / 9.f;
-		float nearClip = 0.1;
+		float nearClip = 0.1f;
 		float farClip = 100.f;
 	};
 
