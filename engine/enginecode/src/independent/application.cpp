@@ -411,6 +411,13 @@ namespace Engine {
 		glm::vec3 right;
 		float advance;
 
+		int qw = 512;
+		int qh = 400;
+		float qwf = 512.f;
+		float qhf = 400.f;
+		Quad* quads2 = (Quad*)malloc(sizeof(Quad) * qw * qh);
+		glm::vec4* tints2 = (glm::vec4*)malloc(sizeof(glm::vec4) * qw * qh);
+
 		while (m_running)
 		{
 			timestep = m_timer->getElapsedTime();

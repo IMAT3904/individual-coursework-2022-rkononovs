@@ -44,13 +44,15 @@ namespace Engine {
 			std::shared_ptr<unsigned char> glyphBuffer;
 			std::shared_ptr <SubTexture> defaultSubTexture;
 			std::array<glm::vec4, 4> quad;
-			std::array<Renderer2DVertex, 4> vertices;
 			std::array<int32_t, 32> textureUnits;
+			std::vector<Renderer2DVertex> vertices;
+			static const uint32_t batchSize = 8192;
 			glm::ivec2 glyphBufferDims;
 			glm::vec4 defaultTint;
 			glm::mat4 model;
 			FT_Library ft;
 			FT_Face font;
+			uint32_t drawCount;
 			uint32_t glyphBufferSize;
 		};
 
@@ -69,5 +71,6 @@ namespace Engine {
 		static void submit(char ch, const glm::vec2& position, float& advance, const glm::vec4& tint); //!< Render a single character with a tint
 		static void submit(const char * text, const glm::vec2& position, const glm::vec4& tint); //!< Render a line of character with a tint
 		static void end(); //!< End the current 2D scene
+		static void flush(); //!< 
 	};
 }

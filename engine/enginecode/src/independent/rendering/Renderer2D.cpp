@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <numeric>
 
 namespace Engine {
 	std::shared_ptr<Renderer2D::InternalData> Renderer2D::s_data = nullptr;
@@ -28,21 +29,14 @@ namespace Engine {
 		s_data->quad[2] = {  0.5f,  0.5f, 1.f, 1.f };
 		s_data->quad[3] = {  0.5f, -0.5f, 1.f, 1.f };
 
-		//std::array<Renderer2DVertex, 4> vertices;
+		s_data->vertices.resize(s_data->batchSize);
 		s_data->vertices[0] = Renderer2DVertex(s_data->quad[0], {0.f, 0.f}, 0, glm::vec4(1.f));
 		s_data->vertices[1] = Renderer2DVertex(s_data->quad[1], {0.f, 1.f}, 0, glm::vec4(1.f));
 		s_data->vertices[2] = Renderer2DVertex(s_data->quad[2], {1.f, 1.f}, 0, glm::vec4(1.f));
 		s_data->vertices[3] = Renderer2DVertex(s_data->quad[3], {1.f, 0.f}, 0, glm::vec4(1.f));
-		/*
-		float vertices[4 * 4] = {
-			-0.5f, -0.5f, 0.f, 0.f,
-			-0.5f,  0.5f, 0.f, 1.f,
-			 0.5f,  0.5f, 1.f, 1.f,
-			 0.5,  -0.5f, 1.f, 0.f
-		};
-		*/
 
-		uint32_t indices[4] = { 0,1,2,3 };
+		std::vector<uint32_t> indices(s_data->batchSize);
+		std::iota(indices.begin(), indices.end(), 0);
 
 		UniformBufferLayout quadLayout = { { "u_projection", ShaderDataType::Mat4}, {"u_view", ShaderDataType::Mat4} };
 		s_data->quadUBO.reset(new OpenGLUniformBuffer(quadLayout));
@@ -52,7 +46,7 @@ namespace Engine {
 
 		s_data->VAO.reset(new OpenGLVertexArray());
 		VBO.reset(new OpenGLVertexBuffer(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), Renderer2DVertex::layout));
-		IBO.reset(new OpenGLIndexBuffer(indices, 4));
+		IBO.reset(new OpenGLIndexBuffer(indices.data(), indices.size()));
 
 		s_data->VAO->addVertexBuffer(VBO);
 		s_data->VAO->setIndexBuffer(IBO);
@@ -89,6 +83,9 @@ namespace Engine {
 	}
 
 	void Renderer2D::begin(const SceneWideUniforms& sceneWideUniforms){
+		// Reset drawcount
+		s_data->drawCount = 0;
+
 		// Bind the geometry
 		glBindVertexArray(s_data->VAO->getRenderID());
 
@@ -110,7 +107,8 @@ namespace Engine {
 	}
 
 	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<SubTexture>& texture){
-
+		if (s_data->drawCount + 4 > s_data->batchSize) flush();
+		if (RendererCommon::s_textureUnitManager.full()) flush();
 		uint32_t textSlot;
 		const uint32_t& textureID = texture->getBaseTexture()->getRenderID();
 		bool needsBinding = RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
@@ -122,29 +120,26 @@ namespace Engine {
 			texture->getBaseTexture()->bindToSlot(textSlot);
 		}
 
-		//s_data->shader->uploadInt("u_texData", textSlot);
-
 		s_data->model = glm::scale(glm::translate(glm::mat4(1.f), quad.m_translate), quad.m_scale);
 
 		uint32_t packedTint = Renderer2DVertex::pack(tint);
 
-		//s_data->shader->uploadFloat4("u_tint", tint);
-		//s_data->shader->uploadMat4("u_model", s_data->model);
-		
+		uint32_t startIdx = s_data->drawCount;
 		for (int i = 0; i < 4; i++) {
-			s_data->vertices[i].position = s_data->model * s_data->quad[i];
-			s_data->vertices[i].tint = packedTint;
-			s_data->vertices[i].texUnit = textSlot;
+			s_data->vertices[i + startIdx].position = s_data->model * s_data->quad[i];
+			s_data->vertices[i + startIdx].tint = packedTint;
+			s_data->vertices[i + startIdx].texUnit = textSlot;
 		}
 
-		s_data->vertices[0].uvCoords = texture->getUVStart();
-		s_data->vertices[1].uvCoords = { texture->getUVStart().x, texture->getUVEnd().y };
-		s_data->vertices[2].uvCoords = texture->getUVEnd();
-		s_data->vertices[3].uvCoords = { texture->getUVEnd().x, texture->getUVStart().y };
+		s_data->vertices[startIdx + 0].uvCoords = texture->getUVStart();
+		s_data->vertices[startIdx + 1].uvCoords = { texture->getUVStart().x, texture->getUVEnd().y };
+		s_data->vertices[startIdx + 2].uvCoords = texture->getUVEnd();
+		s_data->vertices[startIdx + 3].uvCoords = { texture->getUVEnd().x, texture->getUVStart().y };
 
-		s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), 0);
+		s_data->drawCount += 4;
+		//s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), 0);
 
-		glDrawElements(GL_QUADS, s_data->VAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
+		//glDrawElements(GL_QUADS, s_data->VAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, float angle, bool degrees){
@@ -157,6 +152,9 @@ namespace Engine {
 
 	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<SubTexture>& texture, float angle, bool degrees)
 	{
+		if (s_data->drawCount + 4 > s_data->batchSize) flush();
+		if (RendererCommon::s_textureUnitManager.full()) flush();
+
 		if (degrees) angle = glm::radians(angle);
 
 		uint32_t textSlot;
@@ -170,25 +168,23 @@ namespace Engine {
 			texture->getBaseTexture()->bindToSlot(textSlot);
 		}
 
-		s_data->shader->uploadInt("u_texData", textSlot);
-
 		s_data->model = glm::scale(glm::rotate(glm::translate(glm::mat4(1.f), quad.m_translate), angle, {0.f, 0.f, 1.f }), quad.m_scale);
 
 		uint32_t packedTint = Renderer2DVertex::pack(tint);
 
+		uint32_t startIdx = s_data->drawCount;
 		for (int i = 0; i < 4; i++) {
-			s_data->vertices[i].position = s_data->model * s_data->quad[i];
-			s_data->vertices[i].tint = packedTint;
+			s_data->vertices[i + startIdx].position = s_data->model * s_data->quad[i];
+			s_data->vertices[i + startIdx].tint = packedTint;
+			s_data->vertices[i + startIdx].texUnit = textSlot;
 		}
 
-		s_data->vertices[0].uvCoords = texture->getUVStart();
-		s_data->vertices[1].uvCoords = { texture->getUVStart().x, texture->getUVEnd().y };
-		s_data->vertices[2].uvCoords = texture->getUVEnd();
-		s_data->vertices[3].uvCoords = { texture->getUVEnd().x, texture->getUVStart().y };
+		s_data->vertices[startIdx + 0].uvCoords = texture->getUVStart();
+		s_data->vertices[startIdx + 1].uvCoords = { texture->getUVStart().x, texture->getUVEnd().y };
+		s_data->vertices[startIdx + 2].uvCoords = texture->getUVEnd();
+		s_data->vertices[startIdx + 3].uvCoords = { texture->getUVEnd().x, texture->getUVStart().y };
 
-		s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), 0);
-
-		glDrawElements(GL_QUADS, s_data->VAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
+		s_data->drawCount += 4;
 	}
 
 	void Renderer2D::submit(char ch, const glm::vec2& position, float& advance, const glm::vec4& tint){
@@ -228,6 +224,14 @@ namespace Engine {
 	}
 
 	void Renderer2D::end(){
+		if (s_data->drawCount > 0) flush();
+	}
+
+	void Renderer2D::flush() {
+		s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->drawCount, 0);
+		glDrawElements(GL_QUADS, s_data->VAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
+
+		s_data->drawCount = 0;
 	}
 
 	void Renderer2D::RtoRGBA(unsigned char* rBuffer, uint32_t width, uint32_t height){
