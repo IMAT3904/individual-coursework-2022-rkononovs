@@ -137,9 +137,6 @@ namespace Engine {
 		s_data->vertices[startIdx + 3].uvCoords = { texture->getUVEnd().x, texture->getUVStart().y };
 
 		s_data->drawCount += 4;
-		//s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), 0);
-
-		//glDrawElements(GL_QUADS, s_data->VAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, float angle, bool degrees){

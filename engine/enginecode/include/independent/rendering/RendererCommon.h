@@ -8,7 +8,6 @@
 #include "platform/OpenGL/OpenGLVertexArray.h"
 #include "platform/OpenGL/OpenGLUniformBuffer.h"
 #include "rendering/TextureUnitManager.h"
-
 #include "rendering/shaderDataType.h"
 #include "systems/loggerSys.h"
 

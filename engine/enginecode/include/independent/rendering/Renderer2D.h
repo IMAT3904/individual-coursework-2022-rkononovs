@@ -3,6 +3,7 @@
 
 #include "rendering/RendererCommon.h"
 #include "rendering/subTexture.h"
+#include "rendering/textureAtlas.h"
 #include "ft2build.h"
 #include "freetype/freetype.h"
 
@@ -54,6 +55,7 @@ namespace Engine {
 			FT_Face font;
 			uint32_t drawCount;
 			uint32_t glyphBufferSize;
+			TextureAtlas glyphAtlas;
 		};
 
 		static void RtoRGBA(unsigned char* rBuffer, uint32_t width, uint32_t height);
