@@ -313,7 +313,7 @@ namespace Engine {
 		std::shared_ptr<SubTexture> moonSubTexture;
 		//SubTexture letterSubTexture(letterTexture, glm::vec2(0.f, 0.f), glm::vec2(1.f, 0.5f));
 		//SubTexture numberSubTexture(numberTexture, glm::vec2(0.f, 0.5f), glm::vec2(1.f, 1.f));
-		moonSubTexture.reset(new SubTexture(moonTexture, glm::vec2(0.f, 0.5f), glm::vec2(1.f, 1.f)));
+		moonSubTexture.reset(new SubTexture(moonTexture, glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f)));
 
 #pragma endregion
 

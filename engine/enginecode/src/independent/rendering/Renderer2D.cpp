@@ -122,7 +122,7 @@ namespace Engine {
 			texture->getBaseTexture()->bindToSlot(textSlot);
 		}
 
-		s_data->shader->uploadInt("u_texData", textSlot);
+		//s_data->shader->uploadInt("u_texData", textSlot);
 
 		s_data->model = glm::scale(glm::translate(glm::mat4(1.f), quad.m_translate), quad.m_scale);
 
@@ -134,7 +134,14 @@ namespace Engine {
 		for (int i = 0; i < 4; i++) {
 			s_data->vertices[i].position = s_data->model * s_data->quad[i];
 			s_data->vertices[i].tint = packedTint;
+			s_data->vertices[i].texUnit = textSlot;
 		}
+
+		s_data->vertices[0].uvCoords = texture->getUVStart();
+		s_data->vertices[1].uvCoords = { texture->getUVStart().x, texture->getUVEnd().y };
+		s_data->vertices[2].uvCoords = texture->getUVEnd();
+		s_data->vertices[3].uvCoords = { texture->getUVEnd().x, texture->getUVStart().y };
+
 		s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), 0);
 
 		glDrawElements(GL_QUADS, s_data->VAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
@@ -168,12 +175,17 @@ namespace Engine {
 		s_data->model = glm::scale(glm::rotate(glm::translate(glm::mat4(1.f), quad.m_translate), angle, {0.f, 0.f, 1.f }), quad.m_scale);
 
 		uint32_t packedTint = Renderer2DVertex::pack(tint);
-		//s_data->shader->uploadFloat4("u_tint", tint);
 
 		for (int i = 0; i < 4; i++) {
 			s_data->vertices[i].position = s_data->model * s_data->quad[i];
 			s_data->vertices[i].tint = packedTint;
 		}
+
+		s_data->vertices[0].uvCoords = texture->getUVStart();
+		s_data->vertices[1].uvCoords = { texture->getUVStart().x, texture->getUVEnd().y };
+		s_data->vertices[2].uvCoords = texture->getUVEnd();
+		s_data->vertices[3].uvCoords = { texture->getUVEnd().x, texture->getUVStart().y };
+
 		s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), 0);
 
 		glDrawElements(GL_QUADS, s_data->VAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
