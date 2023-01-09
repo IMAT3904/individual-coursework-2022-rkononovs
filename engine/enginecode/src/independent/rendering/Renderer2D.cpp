@@ -26,14 +26,14 @@ namespace Engine {
 
 		s_data->quad[0] = { -0.5f, -0.5f, 1.f, 1.f };
 		s_data->quad[1] = { -0.5f,  0.5f, 1.f, 1.f };
-		s_data->quad[2] = {  0.5f,  0.5f, 1.f, 1.f };
-		s_data->quad[3] = {  0.5f, -0.5f, 1.f, 1.f };
+		s_data->quad[2] = { 0.5f,  0.5f, 1.f, 1.f };
+		s_data->quad[3] = { 0.5f, -0.5f, 1.f, 1.f };
 
 		s_data->vertices.resize(s_data->batchSize);
-		s_data->vertices[0] = Renderer2DVertex(s_data->quad[0], {0.f, 0.f}, 0, glm::vec4(1.f));
-		s_data->vertices[1] = Renderer2DVertex(s_data->quad[1], {0.f, 1.f}, 0, glm::vec4(1.f));
-		s_data->vertices[2] = Renderer2DVertex(s_data->quad[2], {1.f, 1.f}, 0, glm::vec4(1.f));
-		s_data->vertices[3] = Renderer2DVertex(s_data->quad[3], {1.f, 0.f}, 0, glm::vec4(1.f));
+		s_data->vertices[0] = Renderer2DVertex(s_data->quad[0], { 0.f, 0.f }, 0, glm::vec4(1.f));
+		s_data->vertices[1] = Renderer2DVertex(s_data->quad[1], { 0.f, 1.f }, 0, glm::vec4(1.f));
+		s_data->vertices[2] = Renderer2DVertex(s_data->quad[2], { 1.f, 1.f }, 0, glm::vec4(1.f));
+		s_data->vertices[3] = Renderer2DVertex(s_data->quad[3], { 1.f, 0.f }, 0, glm::vec4(1.f));
 
 		std::vector<uint32_t> indices(s_data->batchSize);
 		std::iota(indices.begin(), indices.end(), 0);
@@ -56,11 +56,6 @@ namespace Engine {
 		// Path to font file
 		const char* filePath = "./assets/fonts/arial.ttf";
 
-		//Set the dim of the glyph buffer
-		s_data->glyphBufferDims = { 256, 256 };
-		s_data->glyphBufferSize = s_data->glyphBufferDims.x * s_data->glyphBufferDims.y * 4 * sizeof(unsigned char);
-		s_data->glyphBuffer.reset(static_cast<unsigned char*>(malloc(s_data->glyphBufferSize)));
-
 		// Init freetype
 		if (FT_Init_FreeType(&s_data->ft)) LoggerSys::error("Error: Freetype could not initialise.");
 
@@ -71,15 +66,33 @@ namespace Engine {
 		int32_t charSize = 86;
 		if (FT_Set_Pixel_Sizes(s_data->font, 0, charSize)) LoggerSys::error("Error: freetype cannot set font size: {0}", charSize);
 
-		//Init font texture
-		s_data->fontTexture.reset(new OpenGLTexture(s_data->glyphBufferDims.x, s_data->glyphBufferDims.y, 4, nullptr, 4));
+		//Fill the texture atlas
+		s_data->glyphData.resize(s_data->lastGlyph - s_data->firstGlyph + 1);
 
-		//Fill the glyph buffer
-		memset(s_data->glyphBuffer.get(), 60, s_data->glyphBufferSize);
+		for (unsigned ch = s_data->firstGlyph; ch <= s_data->lastGlyph; ch++) {
+		//{unsigned char ch = 'g';
+			if (FT_Load_Char(s_data->font, ch, FT_LOAD_RENDER)) LoggerSys::error("Could not load glyph for char {0}", ch);
+			else {
+				GlyphData& gd = s_data->glyphData.at(ch - s_data->firstGlyph);
+				// Get glyph data
+				gd.size = glm::vec2(s_data->font->glyph->bitmap.width, s_data->font->glyph->bitmap.rows);
+				gd.bearing = glm::vec2(s_data->font->glyph->bitmap_left, -s_data->font->glyph->bitmap_top);
 
-		// Send glyph buffer to the texture on the GPU
-		s_data->fontTexture->edit(0, 0, s_data->glyphBufferDims.x, s_data->glyphBufferDims.y, s_data->glyphBuffer.get());
+				// Calculate the advance
+				gd.advance = static_cast<float>(s_data->font->glyph->advance.x >> 6);
 
+				//Set the dim of the glyph buffer
+				glm::vec2 glyphBufferDims = gd.size;
+				uint32_t glyphBufferSize = glyphBufferDims.x * glyphBufferDims.y * 4 * sizeof(unsigned char);
+
+				unsigned char* glyphBuffer = static_cast<unsigned char*>(malloc(glyphBufferSize));
+
+				RtoRGBA(glyphBuffer, s_data->font->glyph->bitmap.buffer, gd.size.x, gd.size.y);
+				s_data->glyphAtlas.add(gd.size.x, gd.size.y, 4, glyphBuffer, gd.subTexture);
+
+				free(glyphBuffer);
+			}
+		}
 	}
 
 	void Renderer2D::begin(const SceneWideUniforms& sceneWideUniforms){
@@ -185,28 +198,17 @@ namespace Engine {
 	}
 
 	void Renderer2D::submit(char ch, const glm::vec2& position, float& advance, const glm::vec4& tint){
-		// Get glyph from freetype
-		if (FT_Load_Char(s_data->font, ch, FT_LOAD_RENDER)) LoggerSys::error("Could not load glyph for char {0}", ch);
-		else {
-			// Get glyph data
-			uint32_t glyphWidth = s_data->font->glyph->bitmap.width;
-			uint32_t glyphHeight = s_data->font->glyph->bitmap.rows;
-			glm::vec2 glyphSize(glyphWidth, glyphHeight);
-			glm::vec2 glyphBearing(s_data->font->glyph->bitmap_left, -s_data->font->glyph->bitmap_top);
 
-			// Calculate the advance
-			advance = static_cast<float>(s_data->font->glyph->advance.x >> 6);
+		if (ch >= s_data->firstGlyph && ch <= s_data->lastGlyph) {
+			GlyphData& gd = s_data->glyphData.at(ch - s_data->firstGlyph);
 
+			advance = gd.advance;
 			// Calculate the quad for the glyph
-			glm::vec2 glyphHalfExtents(s_data->fontTexture->getWidthf() * 0.5f, s_data->fontTexture->getHeightf() * 0.5f);
-			glm::vec2 glyphCentre = (position + glyphBearing) + glyphHalfExtents;
+			glm::vec2 glyphHalfExtents(gd.size * 0.5f);
+			glm::vec2 glyphCentre = (position + gd.bearing) + glyphHalfExtents;
 			Quad quad = Quad::createCentralHalfExtents(glyphCentre, glyphHalfExtents);
 
-			RtoRGBA(s_data->font->glyph->bitmap.buffer, glyphWidth, glyphHeight);
-			s_data->fontTexture->edit(0, 0, s_data->glyphBufferDims.x, s_data->glyphBufferDims.y, s_data->glyphBuffer.get());
-
-			// Sumbit character ( quad )
-			//submit(quad, tint, s_data->fontTexture);
+			submit(quad, tint, gd.subTexture);
 		}
 	}
 
@@ -231,21 +233,18 @@ namespace Engine {
 		s_data->drawCount = 0;
 	}
 
-	void Renderer2D::RtoRGBA(unsigned char* rBuffer, uint32_t width, uint32_t height){
+	void Renderer2D::RtoRGBA(unsigned char *DSTbuffer, unsigned char* SRCBuffer, uint32_t width, uint32_t height){
+		unsigned char* pWalker = DSTbuffer;
 
-		memset(s_data->glyphBuffer.get(), 0, s_data->glyphBufferSize);
-
-		unsigned char* pWalker = s_data->glyphBuffer.get();
 		for (int32_t i = 0; i < height; i++) {
 			for (int32_t j = 0; j < width; j++) {
 				*pWalker = 255; pWalker++; // Go to A
 				*pWalker = 255; pWalker++;// Go to A
 				*pWalker = 255; pWalker++;// Go to A
-				*pWalker = *rBuffer; // Set alpha channel
+				*pWalker = *SRCBuffer; // Set alpha channel
 				pWalker++; // Go toR next pixel
-				rBuffer++; // Go next monochrome pixel
+				SRCBuffer++; // Go next monochrome pixel
 			}
-			pWalker += (s_data->glyphBufferDims.x - width) * 4;
 		}
 	}
 

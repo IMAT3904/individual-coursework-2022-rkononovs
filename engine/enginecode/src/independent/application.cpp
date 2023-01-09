@@ -424,46 +424,6 @@ namespace Engine {
 			m_timer->reset();
 			timeSeconds = m_timerSeconds->getElapsedTime();
 
-			if (m_EulerCamera) {
-				if (!m_updatedView) {
-					swu3D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(camera3DEuler->getCamera().view)));
-					m_updatedView = true;
-				}
-				else {
-					camera3DEuler->onUpdate(timestep);
-				}
-			}
-			else {
-				if (!m_updatedView) {
-					swu3D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(followCamera->getCamera().view)));
-					m_updatedView = true;
-				}
-				else {
-					// PlayerCubeMovement
-					if (InputPoller::isKeyPressed(NG_KEY_W)) {
-						forward = { -models[3][2][0], -models[3][2][1], -models[3][2][2] };
-						positionPlayerCube += forward * 0.05f;
-						models[3] = glm::translate(glm::mat4(1.f), positionPlayerCube);
-					}
-					if (InputPoller::isKeyPressed(NG_KEY_S)) {
-						forward = { -models[3][2][0], -models[3][2][1], -models[3][2][2] };
-						positionPlayerCube += forward * -0.05f;
-						models[3] = glm::translate(glm::mat4(1.f), positionPlayerCube);
-					}
-					if (InputPoller::isKeyPressed(NG_KEY_A)) {
-						right = { -models[3][0][0], -models[3][0][1], -models[3][0][2] };
-						positionPlayerCube += right * 0.05f;
-						models[3] = glm::translate(glm::mat4(1.f), positionPlayerCube);
-					}
-					if (InputPoller::isKeyPressed(NG_KEY_D)) {
-						right = { -models[3][0][0], -models[3][0][1], -models[3][0][2] };
-						positionPlayerCube += right * -0.05f;
-						models[3] = glm::translate(glm::mat4(1.f), positionPlayerCube);
-					}
-					followCamera->onUpdate(timestep);
-				}
-			}
-
 			// Do frame stuff
 			models[0] = glm::rotate(models[0], timestep, glm::vec3(0.f, 1.0, 0.f));
 			models[1] = glm::rotate(models[1], timestep, glm::vec3(0.f, 1.0, 0.f));
@@ -495,7 +455,65 @@ namespace Engine {
 			Renderer2D::submit(quads[2], moonSubTexture);
 			Renderer2D::submit(quads[3], {1.f, 1.f, 0.f, 1.f}, moonSubTexture);
 			Renderer2D::submit(quads[4], {0.f, 1.f, 1.f, 0.5f}, moonSubTexture);
-			Renderer2D::submit("My Game!", { 300.f, 70.f }, { 0.2f, 0.2f, 1.f, 1.f });
+
+			uint32_t x = 200.f;
+
+			Renderer2D::flush();
+
+			if (m_EulerCamera) {
+				if (!m_updatedView) {
+					swu3D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(camera3DEuler->getCamera().view)));
+					m_updatedView = true;
+				}
+				else {
+					camera3DEuler->onUpdate(timestep);
+					Renderer2D::submit("Free look cam", { 250.f, 70.f }, { 0.2f, 0.2f, 1.f, 1.f });
+				}
+			}
+			else {
+				if (!m_updatedView) {
+					swu3D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(followCamera->getCamera().view)));
+					m_updatedView = true;
+				}
+				else {
+					// PlayerCubeMovement
+					if (InputPoller::isKeyPressed(NG_KEY_W)) {
+						forward = { -models[3][2][0], -models[3][2][1], -models[3][2][2] };
+						positionPlayerCube += forward * 0.05f;
+						models[3] = glm::translate(glm::mat4(1.f), positionPlayerCube);
+					}
+					if (InputPoller::isKeyPressed(NG_KEY_S)) {
+						forward = { -models[3][2][0], -models[3][2][1], -models[3][2][2] };
+						positionPlayerCube += forward * -0.05f;
+						models[3] = glm::translate(glm::mat4(1.f), positionPlayerCube);
+					}
+					if (InputPoller::isKeyPressed(NG_KEY_A)) {
+						right = { -models[3][0][0], -models[3][0][1], -models[3][0][2] };
+						positionPlayerCube += right * 0.05f;
+						models[3] = glm::translate(glm::mat4(1.f), positionPlayerCube);
+					}
+					if (InputPoller::isKeyPressed(NG_KEY_D)) {
+						right = { -models[3][0][0], -models[3][0][1], -models[3][0][2] };
+						positionPlayerCube += right * -0.05f;
+						models[3] = glm::translate(glm::mat4(1.f), positionPlayerCube);
+					}
+					followCamera->onUpdate(timestep);
+
+					Renderer2D::submit('F', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('o', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('l', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('l', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('o', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('w', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit(' ', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('C', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('a', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('m', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('e', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('r', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+					Renderer2D::submit('a', { x, 70.f }, advance, { 1.f, 1.f, 0.f, 1.f }); x += advance;
+				}
+			}
 
 			Renderer2D::end();
 

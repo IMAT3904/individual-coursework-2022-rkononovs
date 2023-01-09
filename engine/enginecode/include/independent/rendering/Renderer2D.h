@@ -6,6 +6,7 @@
 #include "rendering/textureAtlas.h"
 #include "ft2build.h"
 #include "freetype/freetype.h"
+//#include <algorithm>
 
 namespace Engine {
 	class Renderer2DVertex {
@@ -36,29 +37,35 @@ namespace Engine {
 	*/
 	class Renderer2D {
 	private:
+		struct GlyphData {
+			glm::vec2 size;
+			glm::vec2 bearing;
+			float advance;
+			std::shared_ptr<SubTexture> subTexture;
+		};
 		struct InternalData {
 			std::shared_ptr<OpenGLTexture> defaultTexture;
 			std::shared_ptr<OpenGLTexture> fontTexture;
 			std::shared_ptr<OpenGLShader> shader;
 			std::shared_ptr<OpenGLVertexArray> VAO;
 			std::shared_ptr<OpenGLUniformBuffer> quadUBO;
-			std::shared_ptr<unsigned char> glyphBuffer;
 			std::shared_ptr <SubTexture> defaultSubTexture;
 			std::array<glm::vec4, 4> quad;
 			std::array<int32_t, 32> textureUnits;
 			std::vector<Renderer2DVertex> vertices;
+			std::vector<GlyphData> glyphData;
 			static const uint32_t batchSize = 8192;
-			glm::ivec2 glyphBufferDims;
 			glm::vec4 defaultTint;
 			glm::mat4 model;
 			FT_Library ft;
 			FT_Face font;
 			uint32_t drawCount;
-			uint32_t glyphBufferSize;
 			TextureAtlas glyphAtlas;
+			unsigned char firstGlyph = 32;
+			unsigned char lastGlyph = 126;
 		};
 
-		static void RtoRGBA(unsigned char* rBuffer, uint32_t width, uint32_t height);
+		static void RtoRGBA(unsigned char* DSTbuffer, unsigned char* SRCBuffer, uint32_t width, uint32_t height);
 		static std::shared_ptr<InternalData> s_data;
 	public:
 		static void init(); //!< Init the renderer
