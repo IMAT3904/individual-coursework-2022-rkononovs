@@ -8,6 +8,7 @@ namespace Engine {
 		static GLenum toGLType(ShaderDataType type) {
 			switch (type) {
 			case ShaderDataType::FlatByte: return GL_BYTE;
+			case ShaderDataType::Byte4   : return GL_UNSIGNED_BYTE;
 			case ShaderDataType::FlatInt : return GL_INT;
 			case ShaderDataType::Int     : return GL_INT;
 			case ShaderDataType::Float   : return GL_FLOAT;

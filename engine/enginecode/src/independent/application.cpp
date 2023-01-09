@@ -310,6 +310,11 @@ namespace Engine {
 		std::shared_ptr<OpenGLTexture> moonTexture;
 		moonTexture.reset(new OpenGLTexture("./assets/textures/moon.png", 0));
 
+		std::shared_ptr<SubTexture> moonSubTexture;
+		//SubTexture letterSubTexture(letterTexture, glm::vec2(0.f, 0.f), glm::vec2(1.f, 0.5f));
+		//SubTexture numberSubTexture(numberTexture, glm::vec2(0.f, 0.5f), glm::vec2(1.f, 1.f));
+		moonSubTexture.reset(new SubTexture(moonTexture, glm::vec2(0.f, 0.5f), glm::vec2(1.f, 1.f)));
+
 #pragma endregion
 
 #pragma region MATERIALS
@@ -480,9 +485,9 @@ namespace Engine {
 
 			Renderer2D::submit(quads[0], {0.f, 1.f, 1.f, 1.f});
 			Renderer2D::submit(quads[1], {0.f, 1.f, 1.f, 1.f}, 45.f, true);
-			Renderer2D::submit(quads[2], moonTexture);
-			Renderer2D::submit(quads[3], {1.f, 1.f, 0.f, 1.f}, moonTexture);
-			Renderer2D::submit(quads[4], {0.f, 1.f, 1.f, 0.5f}, moonTexture);
+			Renderer2D::submit(quads[2], moonSubTexture);
+			Renderer2D::submit(quads[3], {1.f, 1.f, 0.f, 1.f}, moonSubTexture);
+			Renderer2D::submit(quads[4], {0.f, 1.f, 1.f, 0.5f}, moonSubTexture);
 			Renderer2D::submit("My Game!", { 300.f, 70.f }, { 0.2f, 0.2f, 1.f, 1.f });
 
 			Renderer2D::end();

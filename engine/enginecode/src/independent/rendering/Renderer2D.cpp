@@ -7,13 +7,14 @@
 
 namespace Engine {
 	std::shared_ptr<Renderer2D::InternalData> Renderer2D::s_data = nullptr;
-	VertexBufferLayout Renderer2DVertex::layout = VertexBufferLayout({ ShaderDataType::Float4, ShaderDataType::Float2, ShaderDataType::FlatInt });
+	VertexBufferLayout Renderer2DVertex::layout = VertexBufferLayout({ ShaderDataType::Float4, ShaderDataType::Float2, ShaderDataType::FlatInt, {ShaderDataType::Byte4, true} });
 
 	void Renderer2D::init() {
 		s_data.reset(new InternalData);
 
 		unsigned char whitePx[4] = { 255, 255, 255, 255 };
 		s_data->defaultTexture.reset(new OpenGLTexture(1, 1, 4, whitePx, 0));
+		s_data->defaultSubTexture.reset(new SubTexture(s_data->defaultTexture, glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f)));
 		s_data->defaultTint = { 1.f, 1.f, 1.f, 1.f };
 
 		s_data->model = glm::mat4(1.0f);
@@ -28,10 +29,10 @@ namespace Engine {
 		s_data->quad[3] = {  0.5f, -0.5f, 1.f, 1.f };
 
 		//std::array<Renderer2DVertex, 4> vertices;
-		s_data->vertices[0] = Renderer2DVertex(s_data->quad[0], {0.f, 0.f}, 0);
-		s_data->vertices[1] = Renderer2DVertex(s_data->quad[1], {0.f, 1.f}, 0);
-		s_data->vertices[2] = Renderer2DVertex(s_data->quad[2], {1.f, 1.f}, 0);
-		s_data->vertices[3] = Renderer2DVertex(s_data->quad[3], {1.f, 0.f}, 0);
+		s_data->vertices[0] = Renderer2DVertex(s_data->quad[0], {0.f, 0.f}, 0, glm::vec4(1.f));
+		s_data->vertices[1] = Renderer2DVertex(s_data->quad[1], {0.f, 1.f}, 0, glm::vec4(1.f));
+		s_data->vertices[2] = Renderer2DVertex(s_data->quad[2], {1.f, 1.f}, 0, glm::vec4(1.f));
+		s_data->vertices[3] = Renderer2DVertex(s_data->quad[3], {1.f, 0.f}, 0, glm::vec4(1.f));
 		/*
 		float vertices[4 * 4] = {
 			-0.5f, -0.5f, 0.f, 0.f,
@@ -101,35 +102,38 @@ namespace Engine {
 	}
 
 	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint){
-		Renderer2D::submit(quad, tint, s_data->defaultTexture);
+		Renderer2D::submit(quad, tint, s_data->defaultSubTexture);
 	}
 
-	void Renderer2D::submit(const Quad& quad, const std::shared_ptr<OpenGLTexture>& texture){
+	void Renderer2D::submit(const Quad& quad, const std::shared_ptr<SubTexture>& texture){
 		Renderer2D::submit(quad, s_data->defaultTint, texture);
 	}
 
-	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<OpenGLTexture>& texture){
+	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<SubTexture>& texture){
 
 		uint32_t textSlot;
-		const uint32_t& textureID = texture->getRenderID();
+		const uint32_t& textureID = texture->getBaseTexture()->getRenderID();
 		bool needsBinding = RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
 		if (needsBinding) {
 			if (textSlot == -1) {
 				RendererCommon::s_textureUnitManager.clear();
 				RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
 			}
-			texture->bindToSlot(textSlot);
+			texture->getBaseTexture()->bindToSlot(textSlot);
 		}
 
 		s_data->shader->uploadInt("u_texData", textSlot);
 
 		s_data->model = glm::scale(glm::translate(glm::mat4(1.f), quad.m_translate), quad.m_scale);
 
-		s_data->shader->uploadFloat4("u_tint", tint);
-		//s_data->shader->uploadMat4("u_model", s_data->model);
+		uint32_t packedTint = Renderer2DVertex::pack(tint);
 
+		//s_data->shader->uploadFloat4("u_tint", tint);
+		//s_data->shader->uploadMat4("u_model", s_data->model);
+		
 		for (int i = 0; i < 4; i++) {
 			s_data->vertices[i].position = s_data->model * s_data->quad[i];
+			s_data->vertices[i].tint = packedTint;
 		}
 		s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), 0);
 
@@ -137,36 +141,38 @@ namespace Engine {
 	}
 
 	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, float angle, bool degrees){
-		Renderer2D::submit(quad, tint, s_data->defaultTexture, angle, degrees);
+		Renderer2D::submit(quad, tint, s_data->defaultSubTexture, angle, degrees);
 	}
 
-	void Renderer2D::submit(const Quad& quad, const std::shared_ptr<OpenGLTexture>& texture, float angle, bool degrees){
+	void Renderer2D::submit(const Quad& quad, const std::shared_ptr<SubTexture>& texture, float angle, bool degrees){
 		Renderer2D::submit(quad, s_data->defaultTint, texture, angle, degrees);
 	}
 
-	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<OpenGLTexture>& texture, float angle, bool degrees)
+	void Renderer2D::submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<SubTexture>& texture, float angle, bool degrees)
 	{
 		if (degrees) angle = glm::radians(angle);
 
 		uint32_t textSlot;
-		const uint32_t& textureID = texture->getRenderID();
+		const uint32_t& textureID = texture->getBaseTexture()->getRenderID();
 		bool needsBinding = RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
 		if (needsBinding) {
 			if (textSlot == -1) {
 				RendererCommon::s_textureUnitManager.clear();
 				RendererCommon::s_textureUnitManager.getUnit(textureID, textSlot);
 			}
-			texture->bindToSlot(textSlot);
+			texture->getBaseTexture()->bindToSlot(textSlot);
 		}
 
 		s_data->shader->uploadInt("u_texData", textSlot);
 
 		s_data->model = glm::scale(glm::rotate(glm::translate(glm::mat4(1.f), quad.m_translate), angle, {0.f, 0.f, 1.f }), quad.m_scale);
 
-		s_data->shader->uploadFloat4("u_tint", tint);
+		uint32_t packedTint = Renderer2DVertex::pack(tint);
+		//s_data->shader->uploadFloat4("u_tint", tint);
 
 		for (int i = 0; i < 4; i++) {
 			s_data->vertices[i].position = s_data->model * s_data->quad[i];
+			s_data->vertices[i].tint = packedTint;
 		}
 		s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), 0);
 
@@ -195,7 +201,7 @@ namespace Engine {
 			s_data->fontTexture->edit(0, 0, s_data->glyphBufferDims.x, s_data->glyphBufferDims.y, s_data->glyphBuffer.get());
 
 			// Sumbit character ( quad )
-			submit(quad, tint, s_data->fontTexture);
+			//submit(quad, tint, s_data->fontTexture);
 		}
 	}
 
@@ -236,6 +242,18 @@ namespace Engine {
 		result.m_translate = glm::vec3(centre, 0.f);
 		result.m_scale = glm::vec3(halfExtents * 2.0f, 1.0f);
 
+		return result;
+	}
+
+	uint32_t Renderer2DVertex::pack(const glm::vec4& tint){
+		uint32_t result = 0;
+		
+		uint32_t r = (static_cast<uint32_t>(tint.r * 255.f)) << 0;
+		uint32_t g = (static_cast<uint32_t>(tint.g * 255.f)) << 8;
+		uint32_t b = (static_cast<uint32_t>(tint.b * 255.f)) << 16;
+		uint32_t a = (static_cast<uint32_t>(tint.a * 255.f)) << 24;
+
+		result = (r | g | b | a);
 		return result;
 	}
 }

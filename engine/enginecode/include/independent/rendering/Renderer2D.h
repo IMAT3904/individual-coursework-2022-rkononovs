@@ -2,6 +2,7 @@
 #pragma once
 
 #include "rendering/RendererCommon.h"
+#include "rendering/subTexture.h"
 #include "ft2build.h"
 #include "freetype/freetype.h"
 
@@ -9,11 +10,14 @@ namespace Engine {
 	class Renderer2DVertex {
 	public:
 		Renderer2DVertex() = default;
-		Renderer2DVertex(const glm::vec4& pos, const glm::vec2& uv, uint32_t tu) : position(pos), uvCoords(uv), texUnit(tu) {};
+		Renderer2DVertex(const glm::vec4& pos, const glm::vec2& uv, uint32_t tu, const glm::vec4& pTint) : 
+			position(pos), uvCoords(uv), texUnit(tu), tint(pack(pTint)) {};
 		glm::vec4 position;
 		glm::vec2 uvCoords;
 		uint32_t texUnit;
+		uint32_t tint;
 		static VertexBufferLayout layout;
+		static uint32_t pack(const glm::vec4& tint);
 	};
 
 	class Quad {
@@ -38,6 +42,7 @@ namespace Engine {
 			std::shared_ptr<OpenGLVertexArray> VAO;
 			std::shared_ptr<OpenGLUniformBuffer> quadUBO;
 			std::shared_ptr<unsigned char> glyphBuffer;
+			std::shared_ptr <SubTexture> defaultSubTexture;
 			std::array<glm::vec4, 4> quad;
 			std::array<Renderer2DVertex, 4> vertices;
 			std::array<int32_t, 32> textureUnits;
@@ -55,14 +60,14 @@ namespace Engine {
 		static void init(); //!< Init the renderer
 		static void begin(const SceneWideUniforms& sceneWideUniforms); //!< Begin a new 2D scene
 		static void submit(const Quad& quad, const glm::vec4& tint); //!< Render a tinted quad
-		static void submit(const Quad& quad, const std::shared_ptr<OpenGLTexture>& texture); //!< Render a textured quad
-		static void submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<OpenGLTexture>& texture); //!< Render a textured and tinted quad
-		static void submit(const Quad& quad, const glm::vec4& tint, float angle, bool degrees = false); //!< Render a textured and tinted quad
-		static void submit(const Quad& quad, const std::shared_ptr<OpenGLTexture>& texture, float angle, bool degrees = false); //!< Render a textured and tinted quad
-		static void submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<OpenGLTexture>& texture, float angle, bool degrees = false); //!< Render a textured and tinted quad
+		static void submit(const Quad& quad, const std::shared_ptr<SubTexture>& texture); //!< Render a textured quad
+		static void submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<SubTexture>& texture); //!< Render a textured and tinted quad
+		static void submit(const Quad& quad, const glm::vec4& tint, float angle, bool degrees = false); //!< Render a tinted quad with rotation
+		static void submit(const Quad& quad, const std::shared_ptr<SubTexture>& texture, float angle, bool degrees = false); //!< Render a textured with rotation
+		static void submit(const Quad& quad, const glm::vec4& tint, const std::shared_ptr<SubTexture>& texture, float angle, bool degrees = false); //!< Render a textured and tinted quad with rotation
 
 		static void submit(char ch, const glm::vec2& position, float& advance, const glm::vec4& tint); //!< Render a single character with a tint
-		static void submit(const char * text, const glm::vec2& position, const glm::vec4& tint); //!< Render a single character with a tint
+		static void submit(const char * text, const glm::vec2& position, const glm::vec4& tint); //!< Render a line of character with a tint
 		static void end(); //!< End the current 2D scene
 	};
 }
