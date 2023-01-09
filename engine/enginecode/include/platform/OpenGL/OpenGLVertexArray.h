@@ -21,6 +21,7 @@ namespace Engine {
 		void setIndexBuffer(const std::shared_ptr<OpenGLIndexBuffer>& indexBuffer);
 
 		inline std::shared_ptr<OpenGLIndexBuffer> getIndexBuffer() { return m_indexBuffer; };
+		inline std::vector<std::shared_ptr<OpenGLVertexBuffer>> getVertexBuffers() { return m_vertexBuffer; }
 		inline uint32_t getRenderID() const { return m_OpenGL_ID; }
 		inline uint32_t getDrawnCount(){
 			if (m_indexBuffer) { m_indexBuffer->getCount(); }

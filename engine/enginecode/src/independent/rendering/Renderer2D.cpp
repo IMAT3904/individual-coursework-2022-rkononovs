@@ -7,6 +7,7 @@
 
 namespace Engine {
 	std::shared_ptr<Renderer2D::InternalData> Renderer2D::s_data = nullptr;
+	VertexBufferLayout Renderer2DVertex::layout = VertexBufferLayout({ ShaderDataType::Float4, ShaderDataType::Float2, ShaderDataType::FlatInt });
 
 	void Renderer2D::init() {
 		s_data.reset(new InternalData);
@@ -17,14 +18,28 @@ namespace Engine {
 
 		s_data->model = glm::mat4(1.0f);
 
-		s_data->shader.reset(new OpenGLShader("./assets/shaders/quad1.glsl"));
+		s_data->textureUnits = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
 
+		s_data->shader.reset(new OpenGLShader("./assets/shaders/quad2.glsl"));
+
+		s_data->quad[0] = { -0.5f, -0.5f, 1.f, 1.f };
+		s_data->quad[1] = { -0.5f,  0.5f, 1.f, 1.f };
+		s_data->quad[2] = {  0.5f,  0.5f, 1.f, 1.f };
+		s_data->quad[3] = {  0.5f, -0.5f, 1.f, 1.f };
+
+		//std::array<Renderer2DVertex, 4> vertices;
+		s_data->vertices[0] = Renderer2DVertex(s_data->quad[0], {0.f, 0.f}, 0);
+		s_data->vertices[1] = Renderer2DVertex(s_data->quad[1], {0.f, 1.f}, 0);
+		s_data->vertices[2] = Renderer2DVertex(s_data->quad[2], {1.f, 1.f}, 0);
+		s_data->vertices[3] = Renderer2DVertex(s_data->quad[3], {1.f, 0.f}, 0);
+		/*
 		float vertices[4 * 4] = {
 			-0.5f, -0.5f, 0.f, 0.f,
 			-0.5f,  0.5f, 0.f, 1.f,
 			 0.5f,  0.5f, 1.f, 1.f,
 			 0.5,  -0.5f, 1.f, 0.f
 		};
+		*/
 
 		uint32_t indices[4] = { 0,1,2,3 };
 
@@ -35,7 +50,7 @@ namespace Engine {
 		std::shared_ptr<OpenGLIndexBuffer> IBO;
 
 		s_data->VAO.reset(new OpenGLVertexArray());
-		VBO.reset(new OpenGLVertexBuffer(vertices, sizeof(vertices), VertexBufferLayout({ ShaderDataType::Float2, ShaderDataType::Float2 })));
+		VBO.reset(new OpenGLVertexBuffer(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), Renderer2DVertex::layout));
 		IBO.reset(new OpenGLIndexBuffer(indices, 4));
 
 		s_data->VAO->addVertexBuffer(VBO);
@@ -79,6 +94,7 @@ namespace Engine {
 		// Bind the shader
 		glUseProgram(s_data->shader->getRenderID());
 		
+		s_data->shader->uploadIntArray("u_texData", s_data->textureUnits.data(), 32);
 		
 		s_data->quadUBO->uploadData("u_view", sceneWideUniforms.at("u_view").second);
 		s_data->quadUBO->uploadData("u_projection", sceneWideUniforms.at("u_projection").second);
@@ -110,7 +126,12 @@ namespace Engine {
 		s_data->model = glm::scale(glm::translate(glm::mat4(1.f), quad.m_translate), quad.m_scale);
 
 		s_data->shader->uploadFloat4("u_tint", tint);
-		s_data->shader->uploadMat4("u_model", s_data->model);
+		//s_data->shader->uploadMat4("u_model", s_data->model);
+
+		for (int i = 0; i < 4; i++) {
+			s_data->vertices[i].position = s_data->model * s_data->quad[i];
+		}
+		s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), 0);
 
 		glDrawElements(GL_QUADS, s_data->VAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 	}
@@ -143,7 +164,11 @@ namespace Engine {
 		s_data->model = glm::scale(glm::rotate(glm::translate(glm::mat4(1.f), quad.m_translate), angle, {0.f, 0.f, 1.f }), quad.m_scale);
 
 		s_data->shader->uploadFloat4("u_tint", tint);
-		s_data->shader->uploadMat4("u_model", s_data->model);
+
+		for (int i = 0; i < 4; i++) {
+			s_data->vertices[i].position = s_data->model * s_data->quad[i];
+		}
+		s_data->VAO->getVertexBuffers().at(0)->edit(s_data->vertices.data(), sizeof(Renderer2DVertex) * s_data->vertices.size(), 0);
 
 		glDrawElements(GL_QUADS, s_data->VAO->getDrawnCount(), GL_UNSIGNED_INT, nullptr);
 	}

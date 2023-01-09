@@ -7,12 +7,14 @@ namespace Engine {
 	namespace STD {
 		static GLenum toGLType(ShaderDataType type) {
 			switch (type) {
-			case ShaderDataType::Int   : return GL_INT;
-			case ShaderDataType::Float : return GL_FLOAT;
-			case ShaderDataType::Float2: return GL_FLOAT;
-			case ShaderDataType::Float3: return GL_FLOAT;
-			case ShaderDataType::Float4: return GL_FLOAT;
-			case ShaderDataType::Mat4  : return GL_FLOAT;
+			case ShaderDataType::FlatByte: return GL_BYTE;
+			case ShaderDataType::FlatInt : return GL_INT;
+			case ShaderDataType::Int     : return GL_INT;
+			case ShaderDataType::Float   : return GL_FLOAT;
+			case ShaderDataType::Float2  : return GL_FLOAT;
+			case ShaderDataType::Float3  : return GL_FLOAT;
+			case ShaderDataType::Float4  : return GL_FLOAT;
+			case ShaderDataType::Mat4    : return GL_FLOAT;
 			default: return GL_INVALID_ENUM;
 			}
 		}
@@ -38,14 +40,25 @@ namespace Engine {
 			uint32_t normalized = GL_FALSE;
 			if (element.m_normalized) { normalized = GL_TRUE; }
 			glEnableVertexAttribArray(m_attributeIndex);
-			glVertexAttribPointer(
-				m_attributeIndex, 
-				STD::componentCount(element.m_dataType), 
-				STD::toGLType(element.m_dataType),
-				normalized,
-				layout.getStride(),
-				(void*) element.m_offset);
-			m_attributeIndex++;
+			if (element.m_dataType == ShaderDataType::FlatInt || element.m_dataType == ShaderDataType::FlatByte) {
+				glVertexAttribIPointer(
+					m_attributeIndex,
+					STD::componentCount(element.m_dataType),
+					STD::toGLType(element.m_dataType),
+					layout.getStride(),
+					(const void*)element.m_offset);
+				m_attributeIndex++;
+			}
+			else {
+				glVertexAttribPointer(
+					m_attributeIndex,
+					STD::componentCount(element.m_dataType),
+					STD::toGLType(element.m_dataType),
+					normalized,
+					layout.getStride(),
+					(void*)element.m_offset);
+				m_attributeIndex++;
+			}
 		}
 	}
 	void OpenGLVertexArray::setIndexBuffer(const std::shared_ptr<OpenGLIndexBuffer>& indexBuffer)

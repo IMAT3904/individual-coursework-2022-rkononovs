@@ -6,6 +6,16 @@
 #include "freetype/freetype.h"
 
 namespace Engine {
+	class Renderer2DVertex {
+	public:
+		Renderer2DVertex() = default;
+		Renderer2DVertex(const glm::vec4& pos, const glm::vec2& uv, uint32_t tu) : position(pos), uvCoords(uv), texUnit(tu) {};
+		glm::vec4 position;
+		glm::vec2 uvCoords;
+		uint32_t texUnit;
+		static VertexBufferLayout layout;
+	};
+
 	class Quad {
 	private:
 		glm::vec3 m_translate = glm::vec3(0.f); //!< Translation vector
@@ -28,6 +38,9 @@ namespace Engine {
 			std::shared_ptr<OpenGLVertexArray> VAO;
 			std::shared_ptr<OpenGLUniformBuffer> quadUBO;
 			std::shared_ptr<unsigned char> glyphBuffer;
+			std::array<glm::vec4, 4> quad;
+			std::array<Renderer2DVertex, 4> vertices;
+			std::array<int32_t, 32> textureUnits;
 			glm::ivec2 glyphBufferDims;
 			glm::vec4 defaultTint;
 			glm::mat4 model;

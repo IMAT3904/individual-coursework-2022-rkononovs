@@ -73,6 +73,10 @@ namespace Engine {
 		uint32_t uniformLocation = glGetUniformLocation(m_OpenGL_ID, name);
 		glUniform1i(uniformLocation, value);
 	}
+	void OpenGLShader::uploadIntArray(const char* name, int32_t* values, uint32_t count){
+		uint32_t uniformLocation = glGetUniformLocation(m_OpenGL_ID, name);
+		glUniform1iv(uniformLocation, count, values);
+	}
 	void OpenGLShader::uploadFloat(const char* name, float value){
 		uint32_t uniformLocation = glGetUniformLocation(m_OpenGL_ID, name);
 		glUniform1f(uniformLocation, value);

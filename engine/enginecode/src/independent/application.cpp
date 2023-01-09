@@ -412,16 +412,6 @@ namespace Engine {
 			m_timer->reset();
 			timeSeconds = m_timerSeconds->getElapsedTime();
 
-			//Change cameras
-			//if ((InputPoller::isKeyPressed(NG_KEY_TAB) == GLFW_PRESS) && (EulerCamera)) {
-			//	updatedView = false;
-			//	EulerCamera = false;
-			//}
-			//else if ((InputPoller::isKeyPressed(NG_KEY_TAB) == GLFW_PRESS)) {
-			//	updatedView = false;
-		//		EulerCamera = true;
-			//}
-
 			if (m_EulerCamera) {
 				if (!m_updatedView) {
 					swu3D["u_view"] = std::pair<ShaderDataType, void*>(ShaderDataType::Mat4, static_cast<void*>(glm::value_ptr(camera3DEuler->getCamera().view)));
