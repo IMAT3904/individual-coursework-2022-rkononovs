@@ -47,10 +47,8 @@ namespace Engine {
 	void OpenGLTexture::init(uint32_t width, uint32_t height, uint32_t channels, unsigned char* data, uint32_t slot) {
 		glGenTextures(1, &m_OpenGL_ID);
 		glActiveTexture(GL_TEXTURE0 + slot);
-		//LoggerSys::info("Current slot is: {0}", slot);
 		glBindTexture(GL_TEXTURE_2D, m_OpenGL_ID);
 		RendererCommon::s_textureUnitManager.clear();
-		//LoggerSys::info("Binding texture {0} to slot {1}", m_OpenGL_ID, slot);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

@@ -28,6 +28,7 @@ namespace Engine {
 	}
 	void FreeEulerControllerEuler::onUpdate(float timestep){
 		bool camMoved = false;
+		// Control camera
 		if (InputPoller::isKeyPressed(NG_KEY_W)) {
 			float y = m_props.position.y;
 			m_props.position += m_forward * m_props.translationSpeed * timestep;
@@ -53,12 +54,13 @@ namespace Engine {
 			m_props.position += m_up * m_props.translationSpeed * timestep;
 			camMoved = true;
 		}
-		if (InputPoller::isKeyPressed(NG_KEY_C))
+		if (InputPoller::isKeyPressed(NG_KEY_LEFT_CONTROL))
 		{
 			m_props.position -= m_up * m_props.translationSpeed * timestep;
 			camMoved = true;
 		}
 		if (InputPoller::isMouseButtonPressed(NG_MOUSE_BUTTON_RIGHT)) {
+			//!< Calculate rotation to apply
 			if (m_lastMousePosition.x >= 0.f) {
 				camMoved = true;
 				glm::vec2 currentMousePosition = InputPoller::getMousePosition();
@@ -74,6 +76,7 @@ namespace Engine {
 		else {
 			m_lastMousePosition.x = -1.f;
 		}
+
 		if (camMoved) {
 			// Set model
 			glm::mat4 rotX = glm::rotate(glm::mat4(1.f), m_props.pitch, glm::vec3(1.f, 0.f, 0.f));

@@ -70,7 +70,6 @@ namespace Engine {
 		s_data->glyphData.resize(s_data->lastGlyph - s_data->firstGlyph + 1);
 
 		for (unsigned ch = s_data->firstGlyph; ch <= s_data->lastGlyph; ch++) {
-		//{unsigned char ch = 'g';
 			if (FT_Load_Char(s_data->font, ch, FT_LOAD_RENDER)) LoggerSys::error("Could not load glyph for char {0}", ch);
 			else {
 				GlyphData& gd = s_data->glyphData.at(ch - s_data->firstGlyph);

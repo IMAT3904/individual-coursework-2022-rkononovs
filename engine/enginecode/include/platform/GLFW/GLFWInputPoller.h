@@ -1,9 +1,8 @@
-/* \file GLFWInputPoller.h */
+/** \file GLFWInputPoller.h */
+#pragma once
 
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
-
-#pragma once
 
 namespace Engine {
 	/* \class GLFWInputPoller

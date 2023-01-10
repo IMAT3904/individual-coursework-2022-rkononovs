@@ -1,4 +1,4 @@
-/* \file RendererCommon.h */
+/** \file RendererCommon.h */
 #pragma once
 #include <glm/glm.hpp>
 #include <memory>
@@ -12,7 +12,7 @@
 #include "systems/loggerSys.h"
 
 namespace Engine {
-	using SceneWideUniforms = std::unordered_map<const char*, std::pair<ShaderDataType, void*>>;
+	using SceneWideUniforms = std::unordered_map<const char*, std::pair<ShaderDataType, void*>>; //!< Declares SceneWideUniforms in dedicated space.
 	class RendererCommon {
 	public:
 		static TextureUnitManager s_textureUnitManager; //!< texture unit manager

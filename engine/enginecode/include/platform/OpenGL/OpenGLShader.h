@@ -5,6 +5,10 @@
 #include <glm/glm.hpp>
 
 namespace Engine {
+	/**
+	\class OpenGLShader
+	\brief OpenGL implementation of shader class
+	*/
 	class OpenGLShader {
 	private:
 		uint32_t m_OpenGL_ID; //!< Render ID

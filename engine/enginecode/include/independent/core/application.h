@@ -30,8 +30,9 @@ namespace Engine {
 		std::shared_ptr<Timer> m_timerSeconds; //!< Timer for keeping the time in engine in seconds
 		std::shared_ptr<System> m_windowsSystem; //!< Window system
 		std::shared_ptr<Window> m_window; //!< Window
-		bool m_updatedView = false;
-		bool m_EulerCamera = true;
+
+		bool m_updatedView = false; //!< Bool to check if camera/view was changed
+		bool m_EulerCamera = true; //!< Bool to check which camera is currently on
 
 		bool onClose(WindowCloseEvent& e); //!< Run when the window closes
 		bool onResize(WindowResizeEvent& e); //!< Run when the window is resized
@@ -55,6 +56,5 @@ namespace Engine {
 		void run(); //!< Main loop
 	};
 
-	// To be defined in users code
 	Application* startApplication(); //!< Function definition which provides an entry hook
 }

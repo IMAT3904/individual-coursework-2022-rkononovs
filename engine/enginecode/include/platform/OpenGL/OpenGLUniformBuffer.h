@@ -1,12 +1,16 @@
 /** \file OpenGLUniformBuffer.h */
 #pragma once
+
 #include "rendering/bufferLayout.h"
 #include "OpenGLShader.h"
 #include <unordered_map>
 #include <memory>
 
-
 namespace Engine {
+	/**
+	\class OpenGLUniformBuffer
+	\brief OpenGL implementation of Uniform Buffer
+	*/
 	class OpenGLUniformBuffer {
 	private:
 		uint32_t m_OpenGL_ID; //!< OpenGL ID
@@ -17,10 +21,10 @@ namespace Engine {
 		static uint32_t s_blockNumber; //!< Global block number
 	public:
 		OpenGLUniformBuffer(const UniformBufferLayout& layout); //!< Constructor
-		~OpenGLUniformBuffer();
-		void attachShaderBlock(const std::shared_ptr<OpenGLShader>& shader, const char* blockname);
-		void uploadData(const char* uniformName, void* data);
-		inline uint32_t getRenderID() const { return m_OpenGL_ID; }
-		inline const UniformBufferLayout& getLayout() const { return m_layout; }
+		~OpenGLUniformBuffer(); //!< Destructor
+		void attachShaderBlock(const std::shared_ptr<OpenGLShader>& shader, const char* blockname); //!< Attach shader block
+		void uploadData(const char* uniformName, void* data); //!< Upload data
+		inline uint32_t getRenderID() const { return m_OpenGL_ID; } //!< Get OpenGL ID
+		inline const UniformBufferLayout& getLayout() const { return m_layout; } //!< Get layout
 	};
 }

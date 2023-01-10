@@ -80,33 +80,30 @@ namespace Engine {
 	bool Application::onResize(WindowResizeEvent& e)
 	{
 		e.handle(true);
-		//LoggerSys::info("Window resize event: ({0}, {1})", e.getWidth(), e.getHeight());
 		return e.handled();
 	}
 
 	bool Application::onFocus(WindowFocusEvent& e)
 	{
 		e.handle(true);
-		//LoggerSys::info("Window on focus");
 		return e.handled();
 	}
 
 	bool Application::onLostFocus(WindowLostFocusEvent& e)
 	{
 		e.handle(true);
-		//LoggerSys::info("Window lost focus");
 		return e.handled();
 	}
 
 	bool Application::onWindowMoved(WindowMovedEvent& e)
 	{
 		e.handle(true);
-		//LoggerSys::info("Window moved to: ({0}, {1})", e.getXPos(), e.getYPos());
 		return e.handled();
 	}
 
 	bool Application::onKeyPressed(KeyPressedEvent& e) {
 		e.handle(true);
+		// Change cameras
 		if ((InputPoller::isKeyPressed(NG_KEY_TAB) == GLFW_PRESS) && (m_EulerCamera)) {
 			m_updatedView = false;
 			m_EulerCamera = false;
@@ -115,54 +112,47 @@ namespace Engine {
 			m_updatedView = false;
 			m_EulerCamera = true;
 		}
-		//LoggerSys::info("Key pressed event: key: {0}, repeat: {1}", e.getKeyCode(), e.getRepeatCount());
 		return e.handled();
 	}
 	bool Application::onKeyReleased(KeyReleasedEvent& e) {
 		e.handle(true);
-		//LoggerSys::info("Key released event: key: {0}", e.getKeyCode());
 		return e.handled();
 	}
 
 	bool Application::onKeyTyped(KeyTypedEvent& e)
 	{
 		e.handle(true);
-		// How to log that? What does typed even do?
 		return e.handled();
 	}
 
 	bool Application::onMouseButtonPressed(MouseButtonPressedEvent& e)
 	{
 		e.handle(true);
-		//LoggerSys::info("Mouse button {0} pressed", e.getButton());
 		return e.handled();
 	}
 
 	bool Application::onMouseButtonReleased(MouseButtonReleasedEvent& e)
 	{
 		e.handle(true);
-		//LoggerSys::info("Mouse button {0} released", e.getButton());
 		return e.handled();
 	}
 
 	bool Application::onMouseMoved(MouseMovedEvent& e)
 	{
 		e.handle(true);
-		//LoggerSys::info("Mouse moved by {0} x and {1} y.", e.getX(), e.getY());
 		return e.handled();
 	}
 
 	bool Application::onMouseScrolled(MouseScrolledEvent& e)
 	{
 		e.handle(true);
-		//LoggerSys::info("Mouse scrolled by {0} y.", e.getYOffset());
 		return e.handled();
 	}
 
 	Application::~Application()
 	{
 		// Stop logger
-		//m_loggerSystem->stop();
+		m_loggerSystem->stop();
 		// Stop window system
 		m_windowsSystem->stop();
 	}
@@ -279,8 +269,6 @@ namespace Engine {
 		std::shared_ptr<OpenGLIndexBuffer> pyramidIBO;
 
 		pyramidVAO.reset(new OpenGLVertexArray);
-
-		//VertexBufferLayout pyramidBL = { ShaderDataType::Float3, ShaderDataType::Float3, ShaderDataType::Float2 };
 		pyramidVBO.reset(new OpenGLVertexBuffer(pyramidVertices, sizeof(pyramidVertices), cubeBL));
 
 		pyramidIBO.reset(new OpenGLIndexBuffer(pyramidIndices, 18));
@@ -311,8 +299,6 @@ namespace Engine {
 		moonTexture.reset(new OpenGLTexture("./assets/textures/moon.png", 0));
 
 		std::shared_ptr<SubTexture> moonSubTexture;
-		//SubTexture letterSubTexture(letterTexture, glm::vec2(0.f, 0.f), glm::vec2(1.f, 0.5f));
-		//SubTexture numberSubTexture(numberTexture, glm::vec2(0.f, 0.5f), glm::vec2(1.f, 1.f));
 		moonSubTexture.reset(new SubTexture(moonTexture, glm::vec2(0.f, 0.f), glm::vec2(1.f, 1.f)));
 
 #pragma endregion
@@ -411,13 +397,6 @@ namespace Engine {
 		glm::vec3 right;
 		float advance;
 
-		int qw = 512;
-		int qh = 400;
-		float qwf = 512.f;
-		float qhf = 400.f;
-		Quad* quads2 = (Quad*)malloc(sizeof(Quad) * qw * qh);
-		glm::vec4* tints2 = (glm::vec4*)malloc(sizeof(glm::vec4) * qw * qh);
-
 		while (m_running)
 		{
 			timestep = m_timer->getElapsedTime();
@@ -454,7 +433,6 @@ namespace Engine {
 			Renderer2D::submit(quads[1], {0.f, 1.f, 1.f, 1.f}, 45.f, true);
 			Renderer2D::submit(quads[2], moonSubTexture);
 			Renderer2D::submit(quads[3], {1.f, 1.f, 0.f, 1.f}, moonSubTexture);
-			Renderer2D::submit(quads[4], {0.f, 1.f, 1.f, 0.5f}, moonSubTexture);
 
 			uint32_t x = 200.f;
 

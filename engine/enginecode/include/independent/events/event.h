@@ -4,13 +4,14 @@
 
 namespace Engine {
 	/** \enum EventType  
-	* An enum for event types */
+	* An enum for event types 
+	*/
 
 	enum class EventType {
-		None = 0,
-		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
-		KeyPressed, KeyReleased, KeyType,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
+		None = 0, //!< None
+		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved, //!< Window events
+		KeyPressed, KeyReleased, KeyType, //!< Key events
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled //!< Mouse events
 	};
 
 	/** \enum EventCategory

@@ -1,5 +1,6 @@
-# Coursework 2022
-You MUST use this repo to submit your coursework.
-
-When you clone make sure you use recurse submodules.
-This is a tick box in visual studio or use the option --recurse-submodules at the command prompt.
+# Controls
+Right mouse button - Look around
+Tab - Switch Active Camera
+W A S D - Move around
+Spacebar - Fly up
+Left Ctrl - Fly down

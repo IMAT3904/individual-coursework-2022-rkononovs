@@ -8,7 +8,7 @@ namespace Engine{
 
 	GLFWwindow* GLFWInputPoller::s_window = nullptr;
 
-	bool GLFWInputPoller::isKeyPressed(int keyCode)
+	bool GLFWInputPoller::isKeyPressed(int keyCode) // Check if key is pressed
 	{
 		if (s_window) {
 			auto answer = glfwGetKey(s_window, keyCode);
@@ -16,7 +16,7 @@ namespace Engine{
 		}
 		return false;
 	}
-	bool GLFWInputPoller::isMouseButtonPressed(int mouseButton)
+	bool GLFWInputPoller::isMouseButtonPressed(int mouseButton) // Check if mouse button pressed
 	{
 		if (s_window) {
 			auto answer = glfwGetMouseButton(s_window, mouseButton);
@@ -24,7 +24,7 @@ namespace Engine{
 		}
 		return false;
 	}
-	glm::vec2 GLFWInputPoller::getMousePosition()
+	glm::vec2 GLFWInputPoller::getMousePosition() // Retrieve mouse position
 	{
 		if (s_window) {
 			double x, y;

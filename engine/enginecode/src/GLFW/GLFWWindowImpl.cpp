@@ -82,8 +82,6 @@ namespace Engine {
 			}
 		);
 
-
-		// Need help with this -> how does it work????
 		glfwSetCharCallback(m_native,
 			[](GLFWwindow* window, unsigned int keycode)
 			{

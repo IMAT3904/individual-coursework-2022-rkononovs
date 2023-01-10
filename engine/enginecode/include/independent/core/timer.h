@@ -22,18 +22,18 @@ namespace Engine {
 
 	class MiliTimer : public Timer {
 	private:
-		std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
-		std::chrono::time_point<std::chrono::high_resolution_clock> m_endTime;
+		std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime; //!< Starting time of the timer
+		std::chrono::time_point<std::chrono::high_resolution_clock> m_endTime; //!< Ending time of the timer
 	public:
-		inline void start() override { m_startTime = std::chrono::high_resolution_clock::now(); }
-		inline void reset() override { m_startTime = std::chrono::high_resolution_clock::now(); }
+		inline void start() override { m_startTime = std::chrono::high_resolution_clock::now(); } //!< Start the timer
+		inline void reset() override { m_startTime = std::chrono::high_resolution_clock::now(); } //!< End the timer
 
 		float getElapsedTime() {
 			m_endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float, std::milli> elapsed = m_endTime - m_startTime;
 
 			return elapsed.count() / 1000.f;
-		}
+		} //!< Calculate elapsed time
 	};
 
 	/**
@@ -43,17 +43,17 @@ namespace Engine {
 
 	class SecondsTimer : public Timer {
 	private:
-		std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
-		std::chrono::time_point<std::chrono::high_resolution_clock> m_endTime;
+		std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime; //!< Starting time of the timer
+		std::chrono::time_point<std::chrono::high_resolution_clock> m_endTime; //!< Ending time of the timer
 	public:
-		inline void start() override { m_startTime = std::chrono::high_resolution_clock::now(); }
-		inline void reset() override { m_startTime = std::chrono::high_resolution_clock::now(); }
+		inline void start() override { m_startTime = std::chrono::high_resolution_clock::now(); } //!< Start the timer
+		inline void reset() override { m_startTime = std::chrono::high_resolution_clock::now(); } //!< End the timer
 
 		float getElapsedTime() {
 			m_endTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float> elapsed = m_endTime - m_startTime;
 
 			return elapsed.count();
-		}
+		} //!< Calculate elapsed time
 	};
 }

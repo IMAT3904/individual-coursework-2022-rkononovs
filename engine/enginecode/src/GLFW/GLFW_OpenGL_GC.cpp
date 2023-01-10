@@ -14,6 +14,7 @@ namespace Engine {
 
 		if (!result) LoggerSys::error("Could not create OpenGL context for current GLFW Window: {0}", result);
 
+		// Enable GL debug with a callback
 		glEnable(GL_DEBUG_OUTPUT);
 		glDebugMessageCallback(
 			[](

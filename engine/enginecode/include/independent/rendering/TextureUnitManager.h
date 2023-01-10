@@ -5,11 +5,16 @@
 #include <unordered_map>
 
 namespace Engine {
+
+	/**
+	\class TextureUnitManager
+	* \brief class to store texture in a ring buffer
+	*/
 	class TextureUnitManager {
 	private:
 		std::vector<uint32_t> m_textureIds; //!< Internal buffer
-		std::unordered_map<uint32_t, uint32_t> m_textureUnits;
-		size_t m_nextUnit = 0;
+		std::unordered_map<uint32_t, uint32_t> m_textureUnits; //!< Unordered map of texture units
+		size_t m_nextUnit = 0; //!< Next unit
 	public:
 		TextureUnitManager(size_t capacity); //!< Constructor which takes a capacity
 		void clear(); //!< Clear and rest the buffer

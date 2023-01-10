@@ -29,8 +29,5 @@ namespace Engine {
 			s_consoleLogger->error("Could not start file logger: {0}", e.what());
 			s_fileLogger.reset();
 		}
-		//catch (std::exception& e) {
-		//	s_consoleLogger->error("Uncalled error");
-		//}
 	}
 }
