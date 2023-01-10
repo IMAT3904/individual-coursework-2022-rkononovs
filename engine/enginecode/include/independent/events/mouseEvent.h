@@ -5,6 +5,7 @@
 
 namespace Engine {
 	class MouseEvent : public Event {
+	public:
 		int getCategoryFlags() const override { return EventCategoryMouse | EventCategoryInput; } //!< Get the event category flags
 	};
 
@@ -13,7 +14,7 @@ namespace Engine {
 		float m_mouseX;
 		float m_mouseY;
 	public:
-		MouseMovedEvent(float x, float y) : m_mouseX(x), m_mouseY(x) {}
+		MouseMovedEvent(float x, float y) : m_mouseX(x), m_mouseY(y) {}
 
 		EventType getEventType() const override { return EventType::MouseMoved; } //!< Get the event type
 		// int getCategoryFlags() const override { return EventCategoryMouse; } //!< Get the event category flags
@@ -31,7 +32,6 @@ namespace Engine {
 		MouseScrolledEvent(float xOffset, float yOffset) : m_xOffset(xOffset), m_yOffset(yOffset) {}
 
 		EventType getEventType() const override { return EventType::MouseScrolled; } //!< Get the event type
-		// int getCategoryFlags() const override { return EventCategoryMouse; } //!< Get the event category flags
 
 		inline float getXOffset() const { return m_xOffset; }
 		inline float getYOffset() const { return m_yOffset; }
@@ -44,7 +44,6 @@ namespace Engine {
 		MouseButtonPressedEvent(int button) : m_button(button) {}
 
 		EventType getEventType() const override { return EventType::MouseButtonPressed; } //!< Get the event type
-		// int getCategoryFlags() const override { return EventCategoryInput; } //!< Get the event category flags
 
 		inline int getButton() const { return m_button; }
 	};
@@ -56,7 +55,6 @@ namespace Engine {
 		MouseButtonReleasedEvent(int button) : m_button(button) {}
 
 		EventType getEventType() const override { return EventType::MouseButtonReleased; } //!< Get the event type
-		// int getCategoryFlags() const override { return EventCategoryInput; } //!< Get the event category flags
 
 		inline int getButton() const { return m_button; }
 	};
